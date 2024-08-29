@@ -1,0 +1,59 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Current python file",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${file}",
+            "console": "integratedTerminal"
+        },
+        {
+            "name": "eurostat",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/etl/main.py",
+            "args": [
+                "eurostat",
+                "local",
+                "raw",
+                "eurostat",
+                "--new-table"
+            ],
+            "console": "integratedTerminal"
+        },{
+            "name": "usbls",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/etl/main.py",
+            "args": [
+                "usbls",
+                "local",
+                "CUUR0000SA0",
+                "1913",
+                "2023",
+                "raw",
+                "usbls",
+                "--new-table"
+            ],
+            "console": "integratedTerminal"
+        },
+        {
+            "name": "restcountries",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/etl/main.py",
+            "args": [
+                "restcountries",
+                "local",
+                "raw",
+                "restcountries",
+                "--new-table"
+            ],
+            "console": "integratedTerminal"
+        }
+    ]
+}
