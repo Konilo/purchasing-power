@@ -50,7 +50,7 @@ class PsqlConnector:
             logger.error(f"Error executing query: {e}")
             return None
 
-    def update_table(self, schema_name: str, table_name: str, dt: pl.DataFrame, new_table: bool = False):
+    def update_table(self, schema_name: str, table_name: str, df: pl.DataFrame, columns_dtype: dict, new_table: bool = False):
         logger.info(f"Updating table {schema_name}.{table_name}")
 
         # Fail if the table doesn't exist and new_table is False
@@ -75,7 +75,7 @@ class PsqlConnector:
 
         # Update the table
         try:
-            dt.to_pandas(
+            df.to_pandas(
                 use_pyarrow_extension_array=True,
             ).to_sql(
                 table_name,
@@ -83,6 +83,7 @@ class PsqlConnector:
                 schema=schema_name,
                 if_exists="replace",
                 index=False,
+                dtype=columns_dtype,
             )
             logger.info(f"Table {schema_name}.{table_name} updated successfully")
         except Exception as e:

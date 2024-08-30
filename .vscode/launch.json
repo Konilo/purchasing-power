@@ -12,7 +12,7 @@
             "console": "integratedTerminal"
         },
         {
-            "name": "eurostat",
+            "name": "ETL eurostat",
             "type": "debugpy",
             "request": "launch",
             "program": "${workspaceFolder}/etl/main.py",
@@ -25,7 +25,7 @@
             ],
             "console": "integratedTerminal"
         },{
-            "name": "usbls",
+            "name": "ETL usbls",
             "type": "debugpy",
             "request": "launch",
             "program": "${workspaceFolder}/etl/main.py",
@@ -42,7 +42,7 @@
             "console": "integratedTerminal"
         },
         {
-            "name": "restcountries",
+            "name": "ETL restcountries",
             "type": "debugpy",
             "request": "launch",
             "program": "${workspaceFolder}/etl/main.py",

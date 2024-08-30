@@ -14,7 +14,7 @@ logger = logging.getLogger(__name__)
 SEPARATOR = ", "
 
 
-def fetch_usbls_json(series_id: str, start_year: int, end_year: int, registration_key: str, max_years_per_request: int = 19):
+def fetch_usbls_json(series_id: str, start_year: int, end_year: int, registration_key: str, max_years_per_request: int = 19) -> list:
     # At most 19 years of data can be requested at a time with a key and 9 without
     logger.info(f"Fetching USBLS JSON data for series {series_id} from {start_year} to {end_year}")
     headers = {"Content-type": "application/json"}
@@ -56,7 +56,7 @@ def fetch_usbls_json(series_id: str, start_year: int, end_year: int, registratio
     return jsons
 
 
-def parse_usbls_json(jsons: list):
+def parse_usbls_json(jsons: list) -> pl.DataFrame:
     logger.info("Parsing USBLS JSON data")
     data = []
     for json_data in jsons:

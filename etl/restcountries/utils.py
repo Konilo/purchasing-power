@@ -14,7 +14,7 @@ logger = logging.getLogger(__name__)
 SEPARATOR = ", "
 
 
-def fetch_restcountries_json():
+def fetch_restcountries_json() -> dict:
     logger.info(f"Fetching REST Countries JSON data")
 
     url = "https://restcountries.com/v3.1/all"
@@ -29,7 +29,7 @@ def fetch_restcountries_json():
     return json_
 
 
-def parse_restcountries_json(json: dict):
+def parse_restcountries_json(json: dict) -> pl.DataFrame:
     logger.info("Parsing REST Countries JSON data")
 
     data = []

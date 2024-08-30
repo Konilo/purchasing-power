@@ -1,6 +1,7 @@
 from eurostat.utils import fetch_eurostat_xml, parse_eurostat_xml
 from shared.psql_connector import PsqlConnector
 from shared.environments_utils import get_env_var
+from sqlalchemy import Integer, Text, Float
 
 
 # PRC: price
@@ -13,7 +14,17 @@ from shared.environments_utils import get_env_var
 # https://ec.europa.eu/eurostat/cache/metadata/en/prc_hicp_esms.htm#stat_process1724055079363
 
 
-def eurostat(environment: str, db_schema: str, table_name: str, new_table: bool = False):
+COLUMNS_DTYPE = {
+    "coicop": Text,
+    "freq": Text,
+    "geo": Text,
+    "unit": Text,
+    "time_period": Integer,
+    "obs_value": Float,
+}
+
+
+def eurostat(environment: str, db_schema: str, table_name: str, new_table: bool = False) -> None:
     xml = fetch_eurostat_xml()
     df = parse_eurostat_xml(xml)
     with PsqlConnector(
@@ -23,4 +34,4 @@ def eurostat(environment: str, db_schema: str, table_name: str, new_table: bool 
         host=get_env_var(environment, "PSQL_DB_HOST"),
         port=get_env_var(environment, "PSQL_DB_PORT"),
     ) as psql_conn:
-        psql_conn.update_table(db_schema, table_name, df, new_table=new_table)
+        psql_conn.update_table(db_schema, table_name, df, COLUMNS_DTYPE, new_table)

@@ -40,7 +40,7 @@ def fetch_eurostat_xml():
     return xml
 
 
-def parse_eurostat_xml(xml):
+def parse_eurostat_xml(xml: etree.ElementTree) -> pl.DataFrame:
     logger.info("Parsing Eurostat XML data")
     data = []
     for _, series in xml:
