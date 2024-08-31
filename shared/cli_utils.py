@@ -25,4 +25,4 @@ def load_and_register_commands(app: typer.Typer, dir_abspath: str, common_file_n
 
             # If the function exists, add it as a command to the typer app
             if function and callable(function):
-                app.command()(function)
+                app.command(name=dir_name)(function)

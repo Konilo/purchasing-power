@@ -24,67 +24,65 @@ class PsqlConnector:
         self.Session = sessionmaker(bind=self.engine)
 
     def __enter__(self):
-        self.session = self.Session()
+        self.session = self.Session(autobegin=False)
+        self.session.begin()  # Explicit transaction
         return self
 
-    def __exit__(self, exc_type, exc_value, traceback):
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        if exc_type is None:
+            # Commit the transaction if no exceptions occurred in the context block
+            self.session.commit()
+        else:
+            # Otherwise, rollback
+            logger.info("An exception occured, rolling back")
+            self.session.rollback()
         self.session.close()
 
     def execute_query(self, query: str):
-        try:
-            self.session.execute(text(query))
-            self.session.commit()
-            logger.info("Query executed successfully")
-        except Exception as e:
-            logger.error(f"Error executing query: {e}")
-            self.session.rollback()
+        self.session.execute(text(query))
+        logger.info("Query executed successfully")
+
+    def execute_query_from_file(self, query_file_abspath: str):
+        logger.info(f"Executing query from file {query_file_abspath}")
+        with open(query_file_abspath, "r") as query_file:
+            query = query_file.read()
+        self.execute_query(query)
 
     def execute_query_return_df(self, query: str, schema: list = None):
-        try:
-            result = self.session.execute(text(query))
-            rows = result.fetchall()
-            logger.info("Query results fetched successfully")
-            df = pl.DataFrame(rows, schema=schema, orient="row")
-            return df
-        except Exception as e:
-            logger.error(f"Error executing query: {e}")
-            return None
+        result = self.session.execute(text(query))
+        rows = result.fetchall()
+        logger.info("Query results fetched successfully")
+        df = pl.DataFrame(rows, schema=schema, orient="row")
+        return df
 
     def update_table(self, schema_name: str, table_name: str, df: pl.DataFrame, columns_dtype: dict, new_table: bool = False):
         logger.info(f"Updating table {schema_name}.{table_name}")
 
-        # Fail if the table doesn't exist and new_table is False
+        # Raise exception if the table doesn't exist AND new_table is False
         if not new_table:
-            try:
-                result = self.session.execute(
-                    text(
-                        f"""
-                        SELECT *
-                        FROM information_schema.tables
-                        WHERE
-                            table_schema = '{schema_name}'
-                            AND table_name = '{table_name}'
-                        """
-                    )
+            result = self.session.execute(
+                text(
+                    f"""
+                SELECT *
+                FROM information_schema.tables
+                WHERE
+                    table_schema = '{schema_name}'
+                    AND table_name = '{table_name}'
+                """
                 )
-                if not result.fetchone():
-                    raise Exception(f"Table {schema_name}.{table_name} doesn't exist and new_table is False")
-            except Exception as e:
-                logger.error(f"Error checking if table exists: {e}")
-                return
+            )
+            if not result.fetchone():
+                raise Exception(f"Table {schema_name}.{table_name} doesn't exist and new_table is False")
 
         # Update the table
-        try:
-            df.to_pandas(
-                use_pyarrow_extension_array=True,
-            ).to_sql(
-                table_name,
-                self.engine,
-                schema=schema_name,
-                if_exists="replace",
-                index=False,
-                dtype=columns_dtype,
-            )
-            logger.info(f"Table {schema_name}.{table_name} updated successfully")
-        except Exception as e:
-            logger.error(f"Error updating table: {e}")
+        df.to_pandas(
+            use_pyarrow_extension_array=True,
+        ).to_sql(
+            table_name,
+            self.engine,
+            schema=schema_name,
+            if_exists="replace",
+            index=False,
+            dtype=columns_dtype,
+        )
+        logger.info(f"Table {schema_name}.{table_name} updated successfully")
