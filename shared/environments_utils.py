@@ -1,6 +1,7 @@
 import logging
 import os
 import dotenv
+from enum import Enum
 
 
 logging.basicConfig(
@@ -11,7 +12,11 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
-def load_env_from_dir(dir_abspath: str):
+class Environments(str, Enum):
+    local = "local"
+
+
+def load_env_from_dir(dir_abspath: str) -> None:
     env_path = os.path.join(dir_abspath, ".env")
     if os.path.exists(env_path):
         logger.info(f"Loading environment variables from {env_path}")
@@ -21,6 +26,8 @@ def load_env_from_dir(dir_abspath: str):
 
 
 def get_env_var(env_name: str, var_name: str) -> str:
+    if env_name not in Environments.__members__:
+        raise ValueError(f"Invalid environment name: {env_name}")
     env_var_name = f"{env_name.upper()}_{var_name.upper()}"
     env_var = os.getenv(env_var_name)
     if not env_var:

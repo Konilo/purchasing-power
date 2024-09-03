@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "podscape"
+name = "purchasing-power-etl"
 version = "0.1.0"
 description = ""
 authors = ["Konilo Zio <you@example.com>"]

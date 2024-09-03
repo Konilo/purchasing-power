@@ -9,3 +9,6 @@ run-etl-dev-env:
 
 run-enrichment-dev-env:
 	bash enrichment/bin/run_dev_env.sh
+
+run-backend-dev-env:
+	bash backend/bin/run_dev_env.sh

@@ -86,3 +86,23 @@
     GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA enriched TO dataflow;
     ALTER DEFAULT PRIVILEGES IN SCHEMA enriched GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO dataflow;
     ```
+
+
+### Create a read-only user for the enriched schema
+- Reconnect to the purchasing_power database with the default superuser via the PSQL CLI.
+    ```sql
+    exit
+    ```
+    ```shell
+    <PSQL executable> --username postgres --dbname purchasing_power
+    ```
+- Create the read-only user:
+    ```sql
+    CREATE USER read_only WITH PASSWORD '<password>';
+    ```
+- Grant necessary privileges to the read-only user:
+    ```sql
+    GRANT USAGE ON SCHEMA enriched TO read_only;
+    GRANT SELECT ON ALL TABLES IN SCHEMA enriched TO read_only;
+    ALTER DEFAULT PRIVILEGES IN SCHEMA enriched GRANT SELECT ON TABLES TO read_only;
+    ```

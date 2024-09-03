@@ -48,11 +48,13 @@ class PsqlConnector:
             query = query_file.read()
         self.execute_query(query)
 
-    def execute_query_return_df(self, query: str, schema: list = None):
+    def execute_query_return_df(self, query: str, schema: list | dict | None = None):
         result = self.session.execute(text(query))
         rows = result.fetchall()
         logger.info("Query results fetched successfully")
-        df = pl.DataFrame(rows, schema=schema, orient="row")
+        column_names = result.keys()
+        data = [dict(zip(column_names, row)) for row in rows]
+        df = pl.DataFrame(data, schema=schema)
         return df
 
     def update_table(self, schema_name: str, table_name: str, df: pl.DataFrame, columns_dtype: dict, new_table: bool = False):
@@ -63,12 +65,12 @@ class PsqlConnector:
             result = self.session.execute(
                 text(
                     f"""
-                SELECT *
-                FROM information_schema.tables
-                WHERE
-                    table_schema = '{schema_name}'
-                    AND table_name = '{table_name}'
-                """
+                    SELECT *
+                    FROM information_schema.tables
+                    WHERE
+                        table_schema = '{schema_name}'
+                        AND table_name = '{table_name}'
+                    """
                 )
             )
             if not result.fetchone():
