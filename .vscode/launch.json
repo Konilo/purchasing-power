@@ -66,6 +66,16 @@
                     "enriched_schema.sql, dim_countries.sql, dim_cpis.sql, fact_cpi_values.sql, keys.sql",
                 ],
                 "console": "integratedTerminal"
+        },
+        {
+            "name": "Backend tests",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "/usr/local/bin/pytest",
+            "args": [
+                "${workspaceFolder}/backend/tests/test_main.py",
+            ],
+            "console": "integratedTerminal"
         }
     ]
 }

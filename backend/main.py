@@ -1,7 +1,8 @@
 import os
 import sys
 from typing_extensions import Annotated
-from fastapi import FastAPI, Depends, Query
+from fastapi import FastAPI, Depends, Query, Path
+from datetime import datetime
 import polars as pl
 
 # import uvicorn  # Uncomment this for debugging
@@ -29,7 +30,9 @@ app = FastAPI()
 
 
 @app.get("/cpis")
-async def get_cpis(common: Annotated[CommonQueryParams, Depends()]) -> dict:
+async def get_cpis(
+    common: Annotated[CommonQueryParams, Depends()],
+) -> dict:
     with PsqlConnector(
         dbname=get_env_var(common.environment_name, "PSQL_DB_NAME"),
         user=get_env_var(common.environment_name, "PSQL_DB_READ_ONLY_USER"),
@@ -63,7 +66,10 @@ async def get_cpis(common: Annotated[CommonQueryParams, Depends()]) -> dict:
 
 
 @app.get("/cpis/{cpi_id}")
-async def get_cpi(cpi_id: int, common: Annotated[CommonQueryParams, Depends()]):
+async def get_cpi(
+    cpi_id: Annotated[int, Path(gt=0)],
+    common: Annotated[CommonQueryParams, Depends()],
+):
     with PsqlConnector(
         dbname=get_env_var(common.environment_name, "PSQL_DB_NAME"),
         user=get_env_var(common.environment_name, "PSQL_DB_READ_ONLY_USER"),
@@ -117,12 +123,12 @@ async def get_cpi(cpi_id: int, common: Annotated[CommonQueryParams, Depends()]):
 
 @app.get("/cpis/{cpi_id}/correction")
 async def get_cpi_correction(
-    cpi_id: int,
-    year_a: int,
-    year_b: int,
-    amount: float,
+    cpi_id: Annotated[int, Path(gt=0)],
+    year_a: Annotated[int, Query(gt=1900, le=datetime.today().year)],
+    year_b: Annotated[int, Query(gt=1900, le=datetime.today().year)],
+    amount: Annotated[float, Query(gt=0)],
     common: Annotated[CommonQueryParams, Depends()],
-):
+) -> dict:
     with PsqlConnector(
         dbname=get_env_var(common.environment_name, "PSQL_DB_NAME"),
         user=get_env_var(common.environment_name, "PSQL_DB_READ_ONLY_USER"),
