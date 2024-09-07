@@ -29,7 +29,7 @@ def dummy_to_force_subcommand() -> None:
     pass
 
 
-# Load the .env in the current subdirectory of the monorepo
+# Load the .env of the current service of the monorepo
 load_env_from_dir(dir_abspath)
 
 if __name__ == "__main__":

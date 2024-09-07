@@ -25,10 +25,13 @@ def load_env_from_dir(dir_abspath: str) -> None:
     dotenv.load_dotenv(env_path)
 
 
-def get_env_var(env_name: str, var_name: str) -> str:
-    if env_name not in Environments.__members__:
-        raise ValueError(f"Invalid environment name: {env_name}")
-    env_var_name = f"{env_name.upper()}_{var_name.upper()}"
+def get_env_var(var_name: str, env_name: str = "") -> str:
+    if env_name != "":
+        if env_name not in Environments.__members__:
+            raise ValueError(f"Invalid environment name: {env_name}")
+        env_var_name = f"{var_name.upper()}_{env_name.upper()}"
+    else:
+        env_var_name = var_name.upper()
     env_var = os.getenv(env_var_name)
     if not env_var:
         raise ValueError(f"Environment variable {env_var_name} not found")

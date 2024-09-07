@@ -14,7 +14,7 @@ from shared.environments_utils import load_env_from_dir
 app = typer.Typer()
 load_and_register_commands(app, dir_abspath)
 
-# Load the .env in the current subdirectory of the monorepo
+# Load the .env of the current service of the monorepo
 load_env_from_dir(dir_abspath)
 
 if __name__ == "__main__":

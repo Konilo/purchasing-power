@@ -5,11 +5,21 @@ import polars as pl
 import os
 import sys
 
-# Allow imports from the parent directory
+# Allow imports from the parent directories
 parent_dir_abspath = os.path.dirname(os.path.dirname(__file__))
 sys.path.append(parent_dir_abspath)
+grandparent_dir_abspath = os.path.dirname(parent_dir_abspath)
+sys.path.append(grandparent_dir_abspath)
 
+from shared.environments_utils import load_env_from_dir
+from shared.environments_utils import get_env_var
 from main import app
+
+
+# Load the .env of the current service of the monorepo
+load_env_from_dir(parent_dir_abspath)
+
+ENVIRONMENT_NAME = get_env_var("ENVIRONMENT_NAME")
 
 
 client = TestClient(app)
@@ -84,7 +94,12 @@ def test_get_cpis():
     This test checks the structure of the JSON response and the correctness of the data.
     """
 
-    response = client.get(f"/cpis?environment_name=local")
+    response = client.get(
+        f"/cpis",
+        headers={
+            "x-api-key": get_env_var("API_KEYS", ENVIRONMENT_NAME).split(",")[0],
+        },
+    )
     json_response = response.json()
 
     assert response.status_code == 200
@@ -107,7 +122,12 @@ def test_get_cpi():
     """
 
     cpi_id = 1
-    response = client.get(f"/cpis/{cpi_id}?environment_name=local")
+    response = client.get(
+        f"/cpis/{cpi_id}",
+        headers={
+            "x-api-key": get_env_var("API_KEYS", ENVIRONMENT_NAME).split(",")[0],
+        },
+    )
     json_response = response.json()
 
     assert response.status_code == 200
@@ -121,7 +141,7 @@ def test_get_cpi():
 
 
 @patch("main.PsqlConnector", new=MockPsqlConnector)
-def test_get_cpi_correction_calculation():
+def test_get_cpi_correction():
     """
     Test the logic of the get_cpis/{cpi_id}/correction path operation.
 
@@ -134,7 +154,12 @@ def test_get_cpi_correction_calculation():
     year_b = 2021
     amount = 100.0
 
-    response = client.get(f"/cpis/{cpi_id}/correction?year_a={year_a}&year_b={year_b}&amount={amount}&environment_name=local")
+    response = client.get(
+        f"/cpis/{cpi_id}/correction?year_a={year_a}&year_b={year_b}&amount={amount}",
+        headers={
+            "x-api-key": get_env_var("API_KEYS", ENVIRONMENT_NAME).split(",")[0],
+        },
+    )
     json_response = response.json()
 
     assert response.status_code == 200

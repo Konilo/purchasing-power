@@ -28,10 +28,10 @@ def eurostat(environment: str, db_schema: str, table_name: str, new_table: bool 
     xml = fetch_eurostat_xml()
     df = parse_eurostat_xml(xml)
     with PsqlConnector(
-        dbname=get_env_var(environment, "PSQL_DB_NAME"),
-        user=get_env_var(environment, "PSQL_DB_DATAFLOW_USER"),
-        password=get_env_var(environment, "PSQL_DB_DATAFLOW_PASSWORD"),
-        host=get_env_var(environment, "PSQL_DB_HOST"),
-        port=get_env_var(environment, "PSQL_DB_PORT"),
+        dbname=get_env_var("PSQL_DB_NAME", environment),
+        user=get_env_var("PSQL_DB_DATAFLOW_USER", environment),
+        password=get_env_var("PSQL_DB_DATAFLOW_PASSWORD", environment),
+        host=get_env_var("PSQL_DB_HOST", environment),
+        port=get_env_var("PSQL_DB_PORT", environment),
     ) as psql_conn:
         psql_conn.update_table(db_schema, table_name, df, COLUMNS_DTYPE, new_table)

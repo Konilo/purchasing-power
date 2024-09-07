@@ -1,7 +1,7 @@
 import os
 import sys
 from typing_extensions import Annotated
-from fastapi import FastAPI, Depends, Query, Path
+from fastapi import FastAPI, Depends, Query, Path, Header, HTTPException
 from datetime import datetime
 import polars as pl
 
@@ -16,14 +16,17 @@ from shared.environments_utils import load_env_from_dir
 from shared.psql_connector import PsqlConnector
 from shared.environments_utils import get_env_var
 
-
-# Load the .env in the current subdirectory of the monorepo
+# Load the .env of the current service of the monorepo
 load_env_from_dir(dir_abspath)
 
+ENVIRONMENT_NAME = get_env_var("ENVIRONMENT_NAME")
 
-class CommonQueryParams:
-    def __init__(self, environment_name: Annotated[str, Query(...)]):
-        self.environment_name = environment_name
+
+class Common:
+    def __init__(self, x_api_key: Annotated[str, Header(...)]):
+        self.x_api_key = x_api_key
+        if self.x_api_key not in get_env_var("API_KEYS", ENVIRONMENT_NAME).split(","):
+            raise HTTPException(status_code=403, detail="Invalid API Key")
 
 
 app = FastAPI()
@@ -31,14 +34,14 @@ app = FastAPI()
 
 @app.get("/cpis")
 async def get_cpis(
-    common: Annotated[CommonQueryParams, Depends()],
+    common: Annotated[Common, Depends()],
 ) -> dict:
     with PsqlConnector(
-        dbname=get_env_var(common.environment_name, "PSQL_DB_NAME"),
-        user=get_env_var(common.environment_name, "PSQL_DB_READ_ONLY_USER"),
-        password=get_env_var(common.environment_name, "PSQL_DB_READ_ONLY_PASSWORD"),
-        host=get_env_var(common.environment_name, "PSQL_DB_HOST"),
-        port=get_env_var(common.environment_name, "PSQL_DB_PORT"),
+        dbname=get_env_var("PSQL_DB_NAME", ENVIRONMENT_NAME),
+        user=get_env_var("PSQL_DB_READ_ONLY_USER", ENVIRONMENT_NAME),
+        password=get_env_var("PSQL_DB_READ_ONLY_PASSWORD", ENVIRONMENT_NAME),
+        host=get_env_var("PSQL_DB_HOST", ENVIRONMENT_NAME),
+        port=get_env_var("PSQL_DB_PORT", ENVIRONMENT_NAME),
     ) as psql_conn:
         df = psql_conn.execute_query_return_df(
             query="""
@@ -67,15 +70,15 @@ async def get_cpis(
 
 @app.get("/cpis/{cpi_id}")
 async def get_cpi(
+    common: Annotated[Common, Depends()],
     cpi_id: Annotated[int, Path(gt=0)],
-    common: Annotated[CommonQueryParams, Depends()],
-):
+) -> dict:
     with PsqlConnector(
-        dbname=get_env_var(common.environment_name, "PSQL_DB_NAME"),
-        user=get_env_var(common.environment_name, "PSQL_DB_READ_ONLY_USER"),
-        password=get_env_var(common.environment_name, "PSQL_DB_READ_ONLY_PASSWORD"),
-        host=get_env_var(common.environment_name, "PSQL_DB_HOST"),
-        port=get_env_var(common.environment_name, "PSQL_DB_PORT"),
+        dbname=get_env_var("PSQL_DB_NAME", ENVIRONMENT_NAME),
+        user=get_env_var("PSQL_DB_READ_ONLY_USER", ENVIRONMENT_NAME),
+        password=get_env_var("PSQL_DB_READ_ONLY_PASSWORD", ENVIRONMENT_NAME),
+        host=get_env_var("PSQL_DB_HOST", ENVIRONMENT_NAME),
+        port=get_env_var("PSQL_DB_PORT", ENVIRONMENT_NAME),
     ) as psql_conn:
         cpi_values_df = psql_conn.execute_query_return_df(
             query=f"""
@@ -123,18 +126,18 @@ async def get_cpi(
 
 @app.get("/cpis/{cpi_id}/correction")
 async def get_cpi_correction(
+    common: Annotated[Common, Depends()],
     cpi_id: Annotated[int, Path(gt=0)],
     year_a: Annotated[int, Query(gt=1900, le=datetime.today().year)],
     year_b: Annotated[int, Query(gt=1900, le=datetime.today().year)],
     amount: Annotated[float, Query(gt=0)],
-    common: Annotated[CommonQueryParams, Depends()],
 ) -> dict:
     with PsqlConnector(
-        dbname=get_env_var(common.environment_name, "PSQL_DB_NAME"),
-        user=get_env_var(common.environment_name, "PSQL_DB_READ_ONLY_USER"),
-        password=get_env_var(common.environment_name, "PSQL_DB_READ_ONLY_PASSWORD"),
-        host=get_env_var(common.environment_name, "PSQL_DB_HOST"),
-        port=get_env_var(common.environment_name, "PSQL_DB_PORT"),
+        dbname=get_env_var("PSQL_DB_NAME", ENVIRONMENT_NAME),
+        user=get_env_var("PSQL_DB_READ_ONLY_USER", ENVIRONMENT_NAME),
+        password=get_env_var("PSQL_DB_READ_ONLY_PASSWORD", ENVIRONMENT_NAME),
+        host=get_env_var("PSQL_DB_HOST", ENVIRONMENT_NAME),
+        port=get_env_var("PSQL_DB_PORT", ENVIRONMENT_NAME),
     ) as psql_conn:
         cpi_values_df = psql_conn.execute_query_return_df(
             query=f"""
