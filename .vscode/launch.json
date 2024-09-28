@@ -76,6 +76,13 @@
                 "${workspaceFolder}/backend/tests/test_main.py",
             ],
             "console": "integratedTerminal"
-        }
+        },
+        {
+            "name": "Frontend Chrome",
+            "request": "launch",
+            "type": "chrome",
+            "url": "http://localhost:5173",
+            "webRoot": "${workspaceFolder}/frontend/app",
+        },
     ]
 }

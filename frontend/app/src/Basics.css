@@ -1,0 +1,14 @@
+.basics h1 {
+  font-size: 2em;
+  margin-bottom: 1em;
+  color: #ff9900;
+}
+
+.basics h2 {
+  font-size: 1.5em;
+  margin-top: 1em;
+}
+
+.basics .plot {
+    margin-top: 1em;
+}

@@ -12,3 +12,6 @@ run-enrichment-dev-env:
 
 run-backend-dev-env:
 	bash backend/bin/run_dev_env.sh
+
+run-frontend-dev-env:
+	bash frontend/bin/run_dev_env.sh

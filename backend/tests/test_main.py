@@ -69,8 +69,11 @@ class MockPsqlConnector:
             if "dim_cpis" in query:
                 return pl.DataFrame(
                     {
+                        "cpi_id": [1],
+                        "cpi_name": ["CPI 1"],
+                        "country_name": ["Country 1"],
                         "institution_name": ["Institution 1"],
-                        "currency_symbol": ["USD"],
+                        "currency_symbol": ["$"],
                         "documentation_link": ["http://example.com"],
                         "legal_mentions": ["Legal mentions"],
                     }
@@ -132,8 +135,11 @@ def test_get_cpi():
 
     assert response.status_code == 200
     assert json_response == {
+        "cpi_id": 1,
+        "cpi_name": "CPI 1",
+        "country_name": "Country 1",
         "institution_name": "Institution 1",
-        "currency_symbol": "USD",
+        "currency_symbol": "$",
         "documentation_link": "http://example.com",
         "legal_mentions": "Legal mentions",
         "values": {"2020": 100.0, "2021": 110.0},
@@ -163,4 +169,8 @@ def test_get_cpi_correction():
     json_response = response.json()
 
     assert response.status_code == 200
-    assert json_response == {"corrected_amount": 110.0, "currency": "USD"}
+    assert json_response == {
+        "corrected_amount": 110.0,
+        "inflation_rate": 10.0,
+        "currency": "USD",
+    }

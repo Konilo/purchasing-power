@@ -1,0 +1,15 @@
+FROM node:20
+
+WORKDIR /app
+
+# COPY ./package.json package-lock.json /app/frontend/
+
+# RUN npm install
+
+# Copy the relevant dirs
+COPY ./frontend /app/frontend
+COPY ./shared /app/shared
+COPY ./.vscode /app/.vscode
+
+# Expose the port the app runs on
+EXPOSE 5173

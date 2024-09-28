@@ -4,6 +4,7 @@ from typing_extensions import Annotated
 from fastapi import FastAPI, Depends, Query, Path, Header, HTTPException
 from datetime import datetime
 import polars as pl
+from fastapi.middleware.cors import CORSMiddleware
 
 # import uvicorn  # Uncomment this for debugging
 
@@ -30,6 +31,15 @@ class Common:
 
 
 app = FastAPI()
+
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:5173"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 @app.get("/cpis")
@@ -94,6 +104,9 @@ async def get_cpi(
         cpi_df = psql_conn.execute_query_return_df(
             query=f"""
                 SELECT
+                    cpis.id as cpi_id,
+                    cpis.name AS cpi_name,
+                    countries.name AS country_name,
                     cpis.institution_name,
                     countries.currency_symbol,
                     cpis.documentation_link,
@@ -115,6 +128,9 @@ async def get_cpi(
             }
         )
     final_dict = {
+        "cpi_id": cpi_df[0, "cpi_id"],
+        "cpi_name": cpi_df[0, "cpi_name"],
+        "country_name": cpi_df[0, "country_name"],
         "institution_name": cpi_df[0, "institution_name"],
         "currency_symbol": cpi_df[0, "currency_symbol"],
         "documentation_link": cpi_df[0, "documentation_link"],
@@ -167,8 +183,10 @@ async def get_cpi_correction(
     year_a_cpi_value = cpi_values_df.filter(pl.col("year") == year_a).select(pl.col("value"))[0, 0]
     year_b_cpi_value = cpi_values_df.filter(pl.col("year") == year_b).select(pl.col("value"))[0, 0]
     corrected_amount = round(amount / year_a_cpi_value * year_b_cpi_value, 2)
+    inflation_rate = round((year_b_cpi_value - year_a_cpi_value) / year_a_cpi_value * 100, 2)
     final_dict = {
         "corrected_amount": corrected_amount,
+        "inflation_rate": inflation_rate,
         "currency": currency,
     }
     return final_dict
