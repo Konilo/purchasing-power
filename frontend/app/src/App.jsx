@@ -49,7 +49,7 @@ function About() {
       <h2>Measuring purchasing power &gt; counting dollars</h2>
       <p>
         The purchasing power of a currency unit varies over time. For
-        example, in the US, the purcahsing power of the US dollar fell by almost
+        example, in the US, the purchasing power of the US dollar fell by almost
         18% between 2020 and 2023 (USBLS,{" "}
         <a href="https://data.bls.gov/timeseries/CUUR0000SA0" target="_blank" rel="noreferrer">
           2024
@@ -281,7 +281,7 @@ function CpiCorrection({ selectedCpi }) {
         {
           headers: {
             accept: "application/json",
-            "x-api-key": "yDN*GBW6MrnkoVoV",
+            "x-api-key": import.meta.env.VITE_BACKEND_API_KEY,
           },
         }
       )
@@ -425,9 +425,8 @@ function Footer() {
   return (
     <div>
       <p>
-        &copy;
-        2024{" "}
-        <a href="https://github.com/Konilo" target="_blank" rel="noreferrer">
+        &copy; 2024{" "}
+        <a href="https://linktr.ee/konilozio" target="_blank" rel="noreferrer">
           Konilo Zio
         </a>
       </p>

@@ -1,10 +1,11 @@
-# Setting up the production backend server
-## Creation of the EC2 instance
+# Backend
+## Setting up the production backend server
+### Creation of the EC2 instance
 
 Create an AWS EC2 instance within the Free Tier boundaries. Choose Ubuntu and use the default values for the rest, including the use of key pair (choose an RSA one). Store the resulting .pem file at the root of Backend service.
 
 
-## Connection to the instance
+### Connection to the instance
 
 In the AWS console, go to the page of the new EC2 instance and choose "Connect" and open the "SSH client" tab.
 
@@ -29,7 +30,7 @@ ssh -i ~/aws_keys/"<name of the key pair>.pem" ubuntu@ec2-15-188-48-110.eu-west-
 ```
 
 
-## Installing Docker
+### Installing Docker
 
 Install Docker in the Ubuntu EC2 following those [instructions](https://docs.docker.com/engine/install/ubuntu/#install-using-the-repository).
 
@@ -44,7 +45,7 @@ sudo apt upgrade
 ```
 
 
-## Installing Make
+### Installing Make
 
 If it's not already installed, install `make`.
 ```bash
@@ -52,7 +53,7 @@ sudo apt install make
 ```
 
 
-## Cloning the repo
+### Cloning the repo
 
 Create SSH keys in the EC2.
 ```bash
@@ -85,7 +86,7 @@ git clone git@github.com:Konilo/purchasing-power.git
 ```
 
 
-# Launching the backend
+## Launching the backend
 
 From your local machine's terminal, from the root of the repo, copy the backend service's .env file to the EC2 instance.
 Make sure to have set the correct production environment variables in the .env file.

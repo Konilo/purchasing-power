@@ -1,5 +1,6 @@
-# Setting up a PostgreSQL server for development
-## Install PostgreSQL
+# ETL
+## Setting up a PostgreSQL server for development
+### Install PostgreSQL
 
 - Install PSQL server (port 5432 as usual for PSQL), cf. [here](https://www.codecademy.com/article/installing-and-using-postgresql-locally).
 - Check that it works:
@@ -7,8 +8,8 @@
     - Linux and Mac: `psql --username postgres`
 
 
-## Configure PostgreSQL for remote access
-### On the server
+### Configure PostgreSQL for remote access
+#### On the server
 
 - Get the IP address of the machine where the PSQL server is running:
     - Windows: in powershell, run `ipconfig` and look for the IPv4 address of the network adapter you're using ("Carte Ethernet vEthernet (WSL (Hyper-V firewall))", in my case).
@@ -21,14 +22,14 @@
     - Linux and Mac: `sudo systemctl restart postgresql`.
 
 
-### In the docker container
+#### In the docker container
 
 - In the python interpreter, to test the remote access, run `psycopg2.connect(host=<>, port=<x>, dbname=<x>, user=<x>, password=<x>)`.
 - For Windows: if the above command fails, in the Windows firewall, try adding an inbound rule to allow inbound connections via the 5432 port, cf. [here](https://stackoverflow.com/a/41455744).
 
 
-## Prepare the database
-### Create the database
+### Prepare the database
+#### Create the database
 
 - Connect to PSQL CLI with the default superuser:
     ```shell
@@ -40,7 +41,7 @@
     ```
 
 
-### Create an admin user for the database
+#### Create an admin user for the database
 
 - Create an admin user for the database:
     ```sql
@@ -52,7 +53,7 @@
     ```
 
 
-### Create a dataflow user for the database
+#### Create a dataflow user for the database
 
 - Create the dataflow user:
     ```sql
@@ -60,7 +61,7 @@
     ```
 
 
-### Create the schemas
+#### Create the schemas
 
 - Reconnect to the purchasing_power database with the admin user via the PSQL CLI.
     ```sql
@@ -95,7 +96,7 @@
     ```
 
 
-### Create a read-only user for the enriched schema
+#### Create a read-only user for the enriched schema
 
 - Reconnect to the purchasing_power database with the default superuser via the PSQL CLI.
     ```sql
@@ -116,13 +117,13 @@
     ```
 
 
-# Setting up a PostgreSQL server for production
-## Creating the AWS RDS instance
+## Setting up a PostgreSQL server for production
+### Creating the AWS RDS instance
 
 On AWS, create a PSQL RDS instance using the default values for the Free Tier. (Use the default VPC and default security group, and don't create a database in the instance, we'll do that later.)
 
 
-## Setting it up
+### Setting it up
 
 To setup the database, you can connect to it from your local machine.
 
@@ -144,9 +145,9 @@ psql \
 Now, follow the steps describe in the "Prepare the database" subsection of the "PostgreSQL server for development" section above. Specify the host and port, like in the code chunk above, when connecting to the PSQL in RDS. Otherwise, `psql` will target the local, development server.
 
 
-# Running the ETLs on production
+## Running the ETLs on production
 
-The tables in the database are not meant to changes frequently (since the values we're interested in are yearly). Hence, I propose to run the ETLs on the local machine -- via the production-grade Docker image. Run this below at the root of the repo and that's it.
+The tables in the database are not meant to change frequently (since the values we're interested in are yearly). Hence, I propose to run the ETLs on the local machine -- via the production-grade Docker image. Run this below at the root of the repo and that's it.
 ```bash
 make run_etls_production
 ```
