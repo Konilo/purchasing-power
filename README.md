@@ -3,7 +3,7 @@
 
 Purchasing Power is a web application that provides tools to understand the changing nature of a currency's purchasing power over time and, in the next versions, the impact those evolutions have on simple investment projections. The application contains a database of Consumer Price Indexes (CPIs) gathered from official sources and covers 36 countries (EU and US).
 
-[](readme_assets/app_basics_tab.png)
+![Screenshot of the app's basics tab](readme_assets/app_basics_tab.png)
 
 
 ## The stack
