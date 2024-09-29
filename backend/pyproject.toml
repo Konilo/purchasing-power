@@ -1,0 +1,22 @@
+[tool.poetry]
+name = "purchasing-power-backend"
+version = "0.1.0"
+description = ""
+authors = ["Konilo Zio <you@example.com>"]
+readme = "README.md"
+package-mode = false
+
+[tool.poetry.dependencies]
+python = "^3.12"
+python-dotenv = "^1.0.1"
+sqlalchemy = "^2.0.32"
+psycopg2 = "^2.9.9"
+polars = "^1.6.0"
+fastapi = {extras = ["standard"], version = "^0.112.2"}
+pytest = "^8.3.2"
+httpx = "^0.27.2"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

@@ -1,0 +1,9 @@
+.home {
+  padding: 2em;
+}
+
+.home h1 {
+  font-size: 2em;
+  margin-bottom: 1em;
+  color: #ff9900;
+}
