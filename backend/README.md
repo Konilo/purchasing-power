@@ -31,18 +31,26 @@ ssh -i ~/aws_keys/"<name of the key pair>.pem" ubuntu@ec2-15-188-48-110.eu-west-
 
 ## Installing Docker
 
-Install Docker in the EC2.
+Install Docker in the Ubuntu EC2 following those [instructions](https://docs.docker.com/engine/install/ubuntu/#install-using-the-repository).
+
+For convenience, add the current user to the `docker` group and exit and reconnect to the EC2 instance to apply the changes.
 ```bash
-sudo apt update
-sudo apt install -y docker.io
-sudo systemctl start docker
-sudo systemctl enable docker
+sudo usermod -a -G docker $(whoami)
 ```
 
 A little upgrade won't do no harm.
 ```bash
 sudo apt upgrade
 ```
+
+
+## Installing Make
+
+If it's not already installed, install `make`.
+```bash
+sudo apt install make
+```
+
 
 ## Cloning the repo
 
@@ -64,7 +72,7 @@ Display and copy the public key.
 cat ~/.ssh/id_rsa.pub
 ```
 
-In the GitHub repo, create a deploy key and paste the public key there.
+In the GitHub repo's settings, create a deploy key and paste the public key there.
 
 Test the connection.
 ```bash
@@ -76,9 +84,17 @@ Finally, clone the repo.
 git clone git@github.com:Konilo/purchasing-power.git
 ```
 
+
 # Launching the backend
 
-At the root of the cloned repo in the EC2 instance, run this:
+From your local machine's terminal, from the root of the repo, copy the backend service's .env file to the EC2 instance.
+Make sure to have set the correct production environment variables in the .env file.
+```bash
+scp -i ~/aws_keys/"<name of the key pair>.pem" .env
+scp -i <path to the pem file> backend/.env <username>@<public DNS>:~/purchasing-power/backend/.env
+```
+
+Back in the EC2 instance, at the root of the cloned repo in the EC2 instance, run this:
 ```bash
 make run_backend_production
 ```
