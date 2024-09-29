@@ -78,7 +78,7 @@ function CpiDropdown({ selectedCpi, setSelectedCpi }) {
 
   useEffect(() => {
     axios
-      .get("http://127.0.0.1:8000/cpis", {
+      .get(`${import.meta.env.VITE_BACKEND_URL}/cpis`, {
         headers: {
           accept: "application/json",
           "x-api-key": import.meta.env.VITE_BACKEND_API_KEY,
@@ -124,7 +124,7 @@ function CpiPlot({ selectedCpi }) {
 
   useEffect(() => {
     axios
-      .get(`http://127.0.0.1:8000/cpis/${selectedCpi}`, {
+      .get(`${import.meta.env.VITE_BACKEND_URL}/cpis/${selectedCpi}`, {
         headers: {
           accept: "application/json",
           "x-api-key": import.meta.env.VITE_BACKEND_API_KEY,
@@ -277,7 +277,7 @@ function CpiCorrection({ selectedCpi }) {
   useEffect(() => {
     axios
       .get(
-        `http://127.0.0.1:8000/cpis/${selectedCpi}/correction?year_a=${yearA}&year_b=${yearB}&amount=${amount}`,
+        `${import.meta.env.VITE_BACKEND_URL}/cpis/${selectedCpi}/correction?year_a=${yearA}&year_b=${yearB}&amount=${amount}`,
         {
           headers: {
             accept: "application/json",

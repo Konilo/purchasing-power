@@ -1,7 +1,7 @@
 # Setting up the production backend server
 ## Creation of the EC2 instance
 
-Create an AWS EC2 instance within the Free Tier boundaries. Choose Ubuntu, allow HTTP and HTTPS requests, and use the default values for the rest, including the RSA key pair. Store the resulting .pem file at the root of Backend service.
+Create an AWS EC2 instance within the Free Tier boundaries. Choose Ubuntu and use the default values for the rest, including the use of key pair (choose an RSA one). Store the resulting .pem file at the root of Backend service.
 
 
 ## Connection to the instance
@@ -89,12 +89,30 @@ git clone git@github.com:Konilo/purchasing-power.git
 
 From your local machine's terminal, from the root of the repo, copy the backend service's .env file to the EC2 instance.
 Make sure to have set the correct production environment variables in the .env file.
+You can find the Public IPv4 DNS in the EC2 instance's page in the AWS console. And username should be `ubuntu`, by default.
 ```bash
 scp -i ~/aws_keys/"<name of the key pair>.pem" .env
-scp -i <path to the pem file> backend/.env <username>@<public DNS>:~/purchasing-power/backend/.env
+scp -i <path to the pem file> backend/.env <username>@<Public IPv4 DNS>:~/purchasing-power/backend/.env
 ```
 
 Back in the EC2 instance, at the root of the cloned repo in the EC2 instance, run this:
 ```bash
 make run_backend_production
 ```
+
+To test the backend:
+- in the security group of the EC2 instance, add an inbound rule to allow traffic on port 8000 from your IP address:
+    - Type: Custom TCP
+    - Port Range: 8000
+    - Source: My IP
+- and go to `https://<Public IPv4 DNS>:8000/docs` in your browser.
+
+Inside the EC2 instance, you can run this to see the logs:
+```bash
+docker logs purchasing_power_backend_prod
+```
+
+Finally, add an inbound rule to the EC2 instance's security group to allow the frontend to access the backend:
+- Type: HTTP
+- Source: Anywhere-IPv4
+
