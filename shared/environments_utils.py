@@ -14,6 +14,7 @@ logger = logging.getLogger(__name__)
 
 class Environments(str, Enum):
     local = "local"
+    production = "production"
 
 
 def load_env_from_dir(dir_abspath: str) -> None:
