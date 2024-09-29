@@ -9,7 +9,7 @@ Purchasing Power is a web application that provides tools to understand the chan
 ## The stack
 
 The application is composed of four services:
-- ETL: fetches the data from [Eurostat](https://ec.europa.eu/eurostat), the [US Bureau of Labor Statistics](https://www.bls.gov/), and [REST Countries](https://restcountries.com/) and loads it into a PostgreSQL database.
+- ETL: fetches the data from [Eurostat](https://ec.europa.eu/eurostat), the [US Bureau of Labor Statistics](https://www.bls.gov/), and [REST Countries](https://restcountries.com/) and loads it into a PostgreSQL database hosted on an AWS RDS instance.
     - Python, Docker.
     - Runs punctually on the local machine.
 - Enrichment: normalizes the data in the database.
