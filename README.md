@@ -23,3 +23,5 @@ The application is composed of four services:
     - Runs on an AWS S3 bucket.
 
 This is a monorepo: all services are in the same repository. Also, each service has a README with specific technical instructions.
+
+![Architecture schema](readme_assets/architecture_schema.png)
