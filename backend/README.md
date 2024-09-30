@@ -2,7 +2,11 @@
 ## Setting up the production backend server
 ### Creation of the EC2 instance
 
-Create an AWS EC2 instance within the Free Tier boundaries. Choose Ubuntu and use the default values for the rest, including the use of key pair (choose an RSA one). Store the resulting .pem file at the root of Backend service.
+Create an AWS EC2 instance within the Free Tier boundaries.
+- Choose Ubuntu as the Amazon Machine Image.
+- Choose "Create security group" and allow SSH traffic from "My IP" (or leave "Anywhere" if you want to access the instance from anywhere).
+- Use a key pair (choose an RSA one) and store the resulting .pem file at the root of Backend service.
+- Use the default values for the rest.
 
 
 ### Connection to the instance
@@ -114,6 +118,7 @@ docker logs purchasing_power_backend_prod
 ```
 
 Finally, add an inbound rule to the EC2 instance's security group to allow the frontend to access the backend:
-- Type: HTTP
+- Type: Custom TCP
+- Port Range: 8000
 - Source: Anywhere-IPv4
 
