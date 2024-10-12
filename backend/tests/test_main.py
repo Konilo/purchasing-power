@@ -13,7 +13,7 @@ sys.path.append(grandparent_dir_abspath)
 
 from shared.environments_utils import load_env_from_dir
 from shared.environments_utils import get_env_var
-from main import app
+from ..main import app
 
 
 # Load the .env of the current service of the monorepo
@@ -88,7 +88,7 @@ class MockPsqlConnector:
         return pl.DataFrame()
 
 
-@patch("main.PsqlConnector", new=MockPsqlConnector)
+@patch("backend.routers.get_cpis.PsqlConnector", new=MockPsqlConnector)
 def test_get_cpis():
     """
     Test the get_cpis path operation.
@@ -100,7 +100,9 @@ def test_get_cpis():
     response = client.get(
         f"/cpis",
         headers={
-            "x-api-key": get_env_var("API_KEYS", ENVIRONMENT_NAME).split(",")[0],
+            "x-api-key": get_env_var("API_KEYS", ENVIRONMENT_NAME).split(",")[
+                0
+            ],
         },
     )
     json_response = response.json()
@@ -115,7 +117,7 @@ def test_get_cpis():
     assert json_response == expected_data
 
 
-@patch("main.PsqlConnector", new=MockPsqlConnector)
+@patch("backend.routers.get_cpi.PsqlConnector", new=MockPsqlConnector)
 def test_get_cpi():
     """
     Test the get_cpis/{cpi_id} path operation.
@@ -128,7 +130,9 @@ def test_get_cpi():
     response = client.get(
         f"/cpis/{cpi_id}",
         headers={
-            "x-api-key": get_env_var("API_KEYS", ENVIRONMENT_NAME).split(",")[0],
+            "x-api-key": get_env_var("API_KEYS", ENVIRONMENT_NAME).split(",")[
+                0
+            ],
         },
     )
     json_response = response.json()
@@ -146,7 +150,9 @@ def test_get_cpi():
     }
 
 
-@patch("main.PsqlConnector", new=MockPsqlConnector)
+@patch(
+    "backend.routers.get_cpi_correction.PsqlConnector", new=MockPsqlConnector
+)
 def test_get_cpi_correction():
     """
     Test the logic of the get_cpis/{cpi_id}/correction path operation.
@@ -163,7 +169,9 @@ def test_get_cpi_correction():
     response = client.get(
         f"/cpis/{cpi_id}/correction?year_a={year_a}&year_b={year_b}&amount={amount}",
         headers={
-            "x-api-key": get_env_var("API_KEYS", ENVIRONMENT_NAME).split(",")[0],
+            "x-api-key": get_env_var("API_KEYS", ENVIRONMENT_NAME).split(",")[
+                0
+            ],
         },
     )
     json_response = response.json()
@@ -174,3 +182,67 @@ def test_get_cpi_correction():
         "inflation_rate": 10.0,
         "currency": "USD",
     }
+
+
+def test_project_personal_finances():
+    initial_amount_invested = 0
+    recurring_investment_frequency = "monthly"
+    recurring_investment_amount = 1000
+    investment_duration_yrs = 26
+    annual_gross_yield = 8
+    annual_inflation_rate = 2
+    investment_buy_in_fee_pct = 0.35
+    annual_custody_fee_pct = 0.2
+    investment_sell_out_fee_pct = 0.5
+    tax_on_gains_pct = 17.2
+    currency = "$"
+
+    response = client.get(
+        f"/project_personal_finances?initial_amount_invested={initial_amount_invested}&recurring_investment_frequency={recurring_investment_frequency}&recurring_investment_amount={recurring_investment_amount}&investment_duration_yrs={investment_duration_yrs}&annual_gross_yield={annual_gross_yield}&annual_inflation_rate={annual_inflation_rate}&investment_buy_in_fee_pct={investment_buy_in_fee_pct}&annual_custody_fee_pct={annual_custody_fee_pct}&investment_sell_out_fee_pct={investment_sell_out_fee_pct}&tax_on_gains_pct={tax_on_gains_pct}&currency={currency}",
+        headers={
+            "x-api-key": get_env_var("API_KEYS", ENVIRONMENT_NAME).split(",")[
+                0
+            ],
+        },
+    )
+
+    json_response = response.json()
+    assert response.status_code == 200
+
+    expected_response = {
+        "summary": {
+            "total_spending": 312000,
+            "net_post_tax_final_value": 874703.49,
+            "net_post_tax_inflation_corrected_final_value": 522704.68,
+            "net_post_tax_final_gain": 562703.49,
+            "net_post_tax_inflation_corrected_final_gain": 336259.95,
+            "total_inflation_pct": 67.34,
+            "net_post_tax_yield": 180.35,
+            "net_post_tax_inflation_corrected_yield": 107.78,
+            "currency": "$",
+        },
+        "details": {
+            "initial_amount_invested": 0,
+            "recurring_investment_frequency": "monthly",
+            "recurring_investment_amount": 1000,
+            "total_spending": 312000,
+            "buy_in_fees": 1092.0,
+            "annual_gross_yield": 8.0,
+            "total_custodian_fees": 24.93,
+            "sell_out_fees": 4983.01,
+            "inflation_corrected_sell_out_fees": 2977.74,
+            "net_pre_tax_final_value": 991594.08,
+            "net_pre_tax_inflation_corrected_final_value": 592556.08,
+            "net_pre_tax_final_gain": 679594.08,
+            "net_pre_tax_inflation_corrected_final_gain": 406111.35,
+            "tax_on_gains": 116890.59,
+            "inflation_corrected_tax_on_gains": 69851.4,
+            "net_post_tax_final_gain": 562703.49,
+            "net_post_tax_inflation_corrected_final_gain": 336259.95,
+            "net_post_tax_final_value": 874703.49,
+            "net_post_tax_inflation_corrected_final_value": 522704.68,
+            "currency": "$",
+        },
+    }
+
+    assert json_response == expected_response
