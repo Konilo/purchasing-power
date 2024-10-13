@@ -3,6 +3,7 @@ import PropTypes from "prop-types";
 import { BrowserRouter as Router, Route, Routes, Link } from "react-router-dom";
 import axios from "axios";
 import Plotly from "plotly.js-dist";
+import PersonalFinanceSchema from "./PersonalFinanceSchema";
 import "./App.css"
 import "./Sidebar.css";
 import "./Home.css";
@@ -11,6 +12,12 @@ import "./PersonalFinance.css";
 import "./Footer.css";
 import GitHubLogo from "./assets/github-mark-white.svg";
 
+
+const amount_formatter = new Intl.NumberFormat("en-US", {
+  style: "decimal",
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 2,
+});
 
 function Sidebar() {
   return (
@@ -25,7 +32,7 @@ function Sidebar() {
             <Link to="/basics">Basics</Link>
           </li>
           <li>
-            <Link to="/Personal finance">Personal finance</Link>
+            <Link to="/personal_finance">Personal Finance</Link>
           </li>
         </ul>
       </nav>
@@ -115,8 +122,36 @@ CpiDropdown.propTypes = {
   setSelectedCpi: PropTypes.func.isRequired,
 };
 
+function DropDown({ id, label, options, selectedOption, setSelectedOption }) {
+  const handleSelectChange = (event) => {
+    setSelectedOption(event.target.value);
+    console.log("Selected option:", event.target.value);
+  };
+
+  return (
+    <div>
+      <label htmlFor={id}>{label}</label>
+      <select id={id} value={selectedOption} onChange={handleSelectChange}>
+        {options.map((option) => (
+          <option key={option.id} value={option.id}>
+            {option.name}
+          </option>
+        ))}
+      </select>
+    </div>
+  );
+}
+DropDown.propTypes = {
+  id: PropTypes.string.isRequired,
+  label: PropTypes.string.isRequired,
+  options: PropTypes.arrayOf(PropTypes.object).isRequired,
+  selectedOption: PropTypes.string.isRequired,
+  setSelectedOption: PropTypes.func.isRequired,
+};
+
 function CpiPlot({ selectedCpi }) {
   const [cpiValues, setCpiValues] = useState({});
+  const [annualInflationRates, setAnnualInflationRates] = useState({});
   const [institution, setInstitution] = useState("");
   const [docLink, setDocLink] = useState("");
   const [legalMentions, setLegalMentions] = useState("");
@@ -135,7 +170,8 @@ function CpiPlot({ selectedCpi }) {
         setPlotTitle(
           `${response.data.country_name}, ${response.data.cpi_name}`
         );
-        setCpiValues(response.data.values);
+        setCpiValues(response.data.cpi_values);
+        setAnnualInflationRates(response.data.annual_inflation_rates);
         setInstitution(response.data.institution_name);
         setDocLink(response.data.documentation_link);
         setLegalMentions(response.data.legal_mentions);
@@ -153,13 +189,29 @@ function CpiPlot({ selectedCpi }) {
           y: Object.values(cpiValues),
           type: "scatter",
           mode: "lines+markers",
+          name: "CPI Values",
           marker: { color: "#ff9900" },
+        },
+        {
+          x: Object.keys(annualInflationRates),
+          y: Object.values(annualInflationRates),
+          type: "bar",
+          name: "Annual Inflation Rates",
+          yaxis: "y2",
+          marker: { color: "#47AEA7" },
+          zorder: -1,
         },
       ],
       {
         title: { text: plotTitle },
         xaxis: { title: "Year" },
-        yaxis: { title: "CPI value" },
+        yaxis: { title: "CPI Value" },
+        yaxis2: {
+          title: "Annual Inflation Rate (%)",
+          overlaying: "y",
+          side: "right",
+          showgrid: false,
+        },
         paper_bgcolor: "rgba(0,0,0,0)",
         plot_bgcolor: "rgba(0,0,0,0)",
         font: { color: "white" },
@@ -178,7 +230,7 @@ function CpiPlot({ selectedCpi }) {
         ],
       }
     );
-  }, [cpiValues, plotTitle, institution]);
+  }, [cpiValues, plotTitle, institution, annualInflationRates]);
 
   const isValidUrl = (string) => {
     try {
@@ -225,33 +277,40 @@ CpiPlot.propTypes = {
   selectedCpi: PropTypes.string.isRequired,
 };
 
-function AmountInput({ onChange, value, label }) {
+function AmountInput({ id, label, value, setAmount }) {
+  const handleAmountChange = (event) => {
+    setAmount(Number(event.target.value));
+  };
   return (
     <div>
-      <label htmlFor="amount-input">{label}</label>
-      <input id="amount-input" type="number" min="0.01" step="0.01" onChange={onChange} value={value} />
+      <label htmlFor={id}>{label}</label>
+      <input id={id} type="number" onChange={handleAmountChange} value={value} />
     </div>
   );
 }
 AmountInput.propTypes = {
-  onChange: PropTypes.func.isRequired,
+  id: PropTypes.string.isRequired,
+  label: PropTypes.string.isRequired,
   value: PropTypes.number.isRequired,
-  label: PropTypes.string,
+  setAmount: PropTypes.func.isRequired,
 };
 
-function YearInput({ id, onChange, value, label }) {
+function NumberInput({ id, label, value, setNumber }) {
+  const handleNumberChange = (event) => {
+    setNumber(Number(event.target.value));
+  };
   return (
     <div>
       <label htmlFor={id}>{label}</label>
-      <input id={id} type="number" min="1915" max="2023" onChange={onChange} value={value} />
+      <input id={id} type="number" onChange={handleNumberChange} value={value} />
     </div>
   );
 }
-YearInput.propTypes = {
+NumberInput.propTypes = {
   id: PropTypes.string.isRequired,
-  onChange: PropTypes.func.isRequired,
+  label: PropTypes.string.isRequired,
   value: PropTypes.number.isRequired,
-  label: PropTypes.string,
+  setNumber: PropTypes.func.isRequired,
 };
 
 function CpiCorrection({ selectedCpi }) {
@@ -261,18 +320,6 @@ function CpiCorrection({ selectedCpi }) {
   const [correctedAmount, setCorrectedAmount] = useState(0);
   const [inflationRate, setInflationRate] = useState(0);
   const [currency, setCurrency] = useState("");
-
-  const handleYearAChange = (event) => {
-    setYearA(event.target.value);
-  };
-
-  const handleYearBChange = (event) => {
-    setYearB(event.target.value);
-  };
-
-  const handleAmountChange = (event) => {
-    setAmount(event.target.value);
-  };
 
   useEffect(() => {
     axios
@@ -299,21 +346,22 @@ return (
     <h3>Inflation Correction</h3>
     <div className="cpi-correction-input">
       <AmountInput
-        onChange={handleAmountChange}
-        value={amount}
+        id="basics-amount"
         label={`Amount (${currency}): `}
+        value={amount}
+        setAmount={setAmount}
       />
-      <YearInput
-        id="yearA-input"
+      <NumberInput
+        id="basics-yearA-input"
         label="Starting year: "
-        onChange={handleYearAChange}
         value={yearA}
+        setNumber={setYearA}
       />
-      <YearInput
-        id="yearB-input"
+      <NumberInput
+        id="basics-yearB-input"
         label="Target year: "
-        onChange={handleYearBChange}
         value={yearB}
+        setNumber={setYearB}
       />
     </div>
     <div className="cpi-correction-output">
@@ -321,12 +369,12 @@ return (
         A sum of{" "}
         <strong>
           {currency}
-          {amount}
+          {amount_formatter.format(amount)}
         </strong>{" "}
         in <strong>{yearA}</strong> has the same purchasing power as{" "}
         <strong>
           {currency}
-          {correctedAmount}
+          {amount_formatter.format(correctedAmount)}
         </strong>{" "}
         in <strong>{yearB}</strong> (inflation rate ={" "}
         <strong>{inflationRate}%</strong>).
@@ -410,13 +458,250 @@ function Basics() {
       <CpiCorrection selectedCpi={selectedCpi} />
     </div>
   );
-}
+}   
 
 function PersonalFinance() {
+  // Simulation inputs
+  const [initialAmountInvested, setInitialAmountInvested] = useState(1000);
+  const [recurringInvestmentFrequency, setRecurringInvestmentFrequency] = useState("monthly");
+  const [recurringInvestmentAmount, setRecurringInvestmentAmount] = useState(1000);
+  const [investmentDuration, setInvestmentDuration] = useState(10);
+  const [annualGrossYield, setAnnualGrossYield] = useState(8);
+  const [annualInflationRate, setAnnualInflationRate] = useState(2);
+  const [investmentBuyInFee, setInvestmentBuyInFee] = useState(0.35);
+  const [annualCustodyFee, setAnnualCustodyFee] = useState(0);
+  const [investmentSellOutFee, setInvestmentSellOutFee] = useState(0);
+  const [taxOnGains, setTaxOnGains] = useState(17.5);
+
+  // Simulation output details
+  const [summaryTotalSpending, setSummaryTotalSpending] = useState(0);
+  const [summaryNetPostTaxFinalValue, setSummaryNetPostTaxFinalValue] = useState(0);
+  const [summaryNetPostTaxInflationCorrectedFinalValue, setSummaryNetPostTaxInflationCorrectedFinalValue] = useState(0);
+  const [summaryNetPostTaxFinalGain, setSummaryNetPostTaxFinalGain] = useState(0);
+  const [summaryNetPostTaxInflationCorrectedFinalGain, setSummaryNetPostTaxInflationCorrectedFinalGain] = useState(0);
+  const [summaryTotalInflationPct, setSummaryTotalInflationPct] = useState(0);
+  const [summaryNetPostTaxYield, setSummaryNetPostTaxYield] = useState(0);
+  const [summaryNetPostTaxInflationCorrectedYield, setSummaryNetPostTaxInflationCorrectedYield] = useState(0);
+
+  // Simulation output details
+  const [detailsInitialAmountInvested, setDetailsInitialAmountInvested] = useState(0);
+  const [detailsRecurringInvestmentFrequency, setDetailsRecurringInvestmentFrequency] = useState("");
+  const [detailsRecurringInvestmentAmount, setDetailsRecurringInvestmentAmount] = useState(0);
+  const [detailsTotalSpending, setDetailsTotalSpending] = useState(0);
+  const [detailsBuyInFees, setDetailsBuyInFees] = useState(0);
+  const [detailsAnnualGrossYield, setDetailsAnnualGrossYield] = useState(0);
+  const [detailsTotalCustodianFees, setDetailsTotalCustodianFees] = useState(0);
+  const [detailsSellOutFees, setDetailsSellOutFees] = useState(0);
+  const [detailsInflationCorrectedSellOutFees, setDetailsInflationCorrectedSellOutFees] = useState(0);
+  const [detailsNetPreTaxFinalValue, setDetailsNetPreTaxFinalValue] = useState(0);
+  const [detailsNetPreTaxInflationCorrectedFinalValue, setDetailsNetPreTaxInflationCorrectedFinalValue] = useState(0);
+  const [detailsNetPreTaxFinalGain, setDetailsNetPreTaxFinalGain] = useState(0);
+  const [detailsNetPreTaxInflationCorrectedFinalGain, setDetailsNetPreTaxInflationCorrectedFinalGain] = useState(0);
+  const [detailsTaxOnGains, setDetailsTaxOnGains] = useState(0);
+  const [detailsInflationCorrectedTaxOnGains, setDetailsInflationCorrectedTaxOnGains] = useState(0);
+  const [detailsNetPostTaxFinalGain, setDetailsNetPostTaxFinalGain] = useState(0);
+  const [detailsNetPostTaxInflationCorrectedFinalGain, setDetailsNetPostTaxInflationCorrectedFinalGain] = useState(0);
+  const [detailsInflationCorrectedTotalSpending, setDetailsInflationCorrectedTotalSpending] = useState(0);
+  const [detailsNetPostTaxFinalValue, setDetailsNetPostTaxFinalValue] = useState(0);
+  const [detailsNetPostTaxInflationCorrectedFinalValue, setDetailsNetPostTaxInflationCorrectedFinalValue] = useState(0);
+
+
+  useEffect(() => {
+    axios
+      .get(
+        `${
+          import.meta.env.VITE_BACKEND_URL
+        }/project_personal_finances?initial_amount_invested=${initialAmountInvested}&recurring_investment_frequency=${recurringInvestmentFrequency}&recurring_investment_amount=${recurringInvestmentAmount}&investment_duration_yrs=${investmentDuration}&annual_gross_yield=${annualGrossYield}&annual_inflation_rate=${annualInflationRate}&investment_buy_in_fee_pct=${investmentBuyInFee}&annual_custody_fee_pct=${annualCustodyFee}&investment_sell_out_fee_pct=${investmentSellOutFee}&tax_on_gains_pct=${taxOnGains}`,
+        {
+          headers: {
+            accept: "application/json",
+            "x-api-key": import.meta.env.VITE_BACKEND_API_KEY,
+          },
+        }
+      )
+      .then((response) => {
+        setSummaryTotalSpending(response.data.summary.total_spending);
+        setSummaryNetPostTaxFinalValue(response.data.summary.net_post_tax_final_value);
+        setSummaryNetPostTaxInflationCorrectedFinalValue(response.data.summary.net_post_tax_inflation_corrected_final_value);
+        setSummaryNetPostTaxFinalGain(response.data.summary.net_post_tax_final_gain);
+        setSummaryNetPostTaxInflationCorrectedFinalGain(response.data.summary.net_post_tax_inflation_corrected_final_gain);
+        setSummaryTotalInflationPct(response.data.summary.total_inflation_pct);
+        setSummaryNetPostTaxYield(response.data.summary.net_post_tax_yield);
+        setSummaryNetPostTaxInflationCorrectedYield(response.data.summary.net_post_tax_inflation_corrected_yield);
+
+        setDetailsInitialAmountInvested(response.data.details.initial_amount_invested);
+        setDetailsRecurringInvestmentFrequency(response.data.details.recurring_investment_frequency);
+        setDetailsRecurringInvestmentAmount(response.data.details.recurring_investment_amount);
+        setDetailsTotalSpending(response.data.details.total_spending);
+        setDetailsBuyInFees(response.data.details.buy_in_fees);
+        setDetailsAnnualGrossYield(response.data.details.annual_gross_yield);
+        setDetailsTotalCustodianFees(response.data.details.total_custodian_fees);
+        setDetailsSellOutFees(response.data.details.sell_out_fees);
+        setDetailsInflationCorrectedSellOutFees(response.data.details.inflation_corrected_sell_out_fees);
+        setDetailsNetPreTaxFinalValue(response.data.details.net_pre_tax_final_value);
+        setDetailsNetPreTaxInflationCorrectedFinalValue(response.data.details.net_pre_tax_inflation_corrected_final_value);
+        setDetailsNetPreTaxFinalGain(response.data.details.net_pre_tax_final_gain);
+        setDetailsNetPreTaxInflationCorrectedFinalGain(response.data.details.net_pre_tax_inflation_corrected_final_gain);
+        setDetailsTaxOnGains(response.data.details.tax_on_gains);
+        setDetailsInflationCorrectedTaxOnGains(response.data.details.inflation_corrected_tax_on_gains);
+        setDetailsNetPostTaxFinalGain(response.data.details.net_post_tax_final_gain);
+        setDetailsNetPostTaxInflationCorrectedFinalGain(response.data.details.net_post_tax_inflation_corrected_final_gain);
+        setDetailsInflationCorrectedTotalSpending(response.data.details.inflation_corrected_total_spending);
+        setDetailsNetPostTaxFinalValue(response.data.details.net_post_tax_final_value);
+        setDetailsNetPostTaxInflationCorrectedFinalValue(response.data.details.net_post_tax_inflation_corrected_final_value);
+
+        console.log("Fetched CPI correction");
+      })
+      .catch((error) =>
+        console.error("Error fetching CPI correction:", error)
+      );
+  }, [
+    initialAmountInvested,
+    recurringInvestmentFrequency,
+    recurringInvestmentAmount,
+    investmentDuration,
+    annualGrossYield,
+    annualInflationRate,
+    investmentBuyInFee,
+    annualCustodyFee,
+    investmentSellOutFee,
+    taxOnGains,
+  ]);
+
   return (
     <div className="personal-finance">
       <h1>Personal Finance</h1>
-      <p>Coming soon...</p>
+      <h2>Currencies&apos; purchasing power falls over time. What now?</h2>
+      <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+      <h2>Simulation</h2>
+      <div className="personal-finance-simulation-inputs">
+        <h3>Inputs</h3>
+        <AmountInput
+          id="personal-finance-initial-amount-invested"
+          label={`Initial amount invested ($): `}
+          value={initialAmountInvested}
+          setAmount={setInitialAmountInvested}
+        />
+        <DropDown
+          id="personal-finance-recurring-investment-frequency"
+          label="Recurring investment frequency: "
+          options={[
+            { id: "yearly", name: "Yearly" },
+            { id: "monthly", name: "Monthly" },
+            { id: "weekly", name: "Weekly" },
+          ]}
+          selectedOption="monthly"
+          setSelectedOption={setRecurringInvestmentFrequency}
+        />
+        <AmountInput
+          id="personal-finance-recurring-investment-amount"
+          label={`Recurring investment amount ($): `}
+          value={recurringInvestmentAmount}
+          setAmount={setRecurringInvestmentAmount}
+        />
+        <NumberInput
+          id="personal-finance-investment-duration"
+          label="Investment duration (years): "
+          value={investmentDuration}
+          setNumber={setInvestmentDuration}
+        />
+        <NumberInput
+          id="personal-finance-annual-gross-yield"
+          label="Annual gross yield (%): "
+          value={annualGrossYield}
+          setNumber={setAnnualGrossYield}
+        />
+        <NumberInput
+          id="personal-finance-annual-inflation-rate"
+          label="Annual inflation rate (%): "
+          value={annualInflationRate}
+          setNumber={setAnnualInflationRate}
+        />
+        <NumberInput
+          id="personal-finance-investment-buy-in-fee"
+          label="Investment buy-in fee (%): "
+          value={investmentBuyInFee}
+          setNumber={setInvestmentBuyInFee}
+        />
+        <NumberInput
+          id="personal-finance-annual-custody-fee"
+          label="Annual custody fee (%): "
+          value={annualCustodyFee}
+          setNumber={setAnnualCustodyFee}
+        />
+        <NumberInput
+          id="personal-finance-investment-sell-out-fee"
+          label="Investment sell-out fee (%): "
+          value={investmentSellOutFee}
+          setNumber={setInvestmentSellOutFee}
+        />
+        <NumberInput
+          id="personal-finance-tax-on-gains"
+          label="Tax on gains (%): "
+          value={taxOnGains}
+          setNumber={setTaxOnGains}
+        />
+      </div>
+      <div className="personal-finance-outputs">
+        <h3>Outputs</h3>
+        <h4>Summary</h4>
+        <p>
+          Total spending: ${amount_formatter.format(summaryTotalSpending)}{" "}
+          <br />
+          Net post-tax final value: $
+          {amount_formatter.format(summaryNetPostTaxFinalValue)} <br />
+          Net post-tax inflation-corrected final value: $
+          {amount_formatter.format(
+            summaryNetPostTaxInflationCorrectedFinalValue
+          )}{" "}
+          <br />
+          Net post-tax final gain: $
+          {amount_formatter.format(summaryNetPostTaxFinalGain)} <br />
+          Net post-tax inflation-corrected final gain: $
+          {amount_formatter.format(
+            summaryNetPostTaxInflationCorrectedFinalGain
+          )}{" "}
+          <br />
+          Total inflation: {summaryTotalInflationPct}% <br />
+          Net post-tax yield: {summaryNetPostTaxYield}% <br />
+          Net post-tax inflation-corrected yield:{" "}
+          {summaryNetPostTaxInflationCorrectedYield}% <br />
+        </p>
+        <h4>Details</h4>
+        <PersonalFinanceSchema
+          initialAmountInvested={detailsInitialAmountInvested}
+          recurringInvestmentFrequency={detailsRecurringInvestmentFrequency}
+          recurringInvestmentAmount={detailsRecurringInvestmentAmount}
+          investmentDuration={investmentDuration}
+          totalSpending={detailsTotalSpending}
+          buyInFees={detailsBuyInFees}
+          annualGrossYield={detailsAnnualGrossYield}
+          totalCustodianFees={detailsTotalCustodianFees}
+          sellOutFees={detailsSellOutFees}
+          inflationCorrectedSellOutFees={detailsInflationCorrectedSellOutFees}
+          netPreTaxFinalValue={detailsNetPreTaxFinalValue}
+          netPreTaxInflationCorrectedFinalValue={
+            detailsNetPreTaxInflationCorrectedFinalValue
+          }
+          netPreTaxFinalGain={detailsNetPreTaxFinalGain}
+          netPreTaxInflationCorrectedFinalGain={
+            detailsNetPreTaxInflationCorrectedFinalGain
+          }
+          taxOnGains={detailsTaxOnGains}
+          inflationCorrectedTaxOnGains={detailsInflationCorrectedTaxOnGains}
+          netPostTaxFinalGain={detailsNetPostTaxFinalGain}
+          netPostTaxInflationCorrectedFinalGain={
+            detailsNetPostTaxInflationCorrectedFinalGain
+          }
+          inflationCorrectedTotalSpending={
+            detailsInflationCorrectedTotalSpending
+          }
+          netPostTaxFinalValue={detailsNetPostTaxFinalValue}
+          netPostTaxInflationCorrectedFinalValue={
+            detailsNetPostTaxInflationCorrectedFinalValue
+          }
+        />
+      </div>
     </div>
   );
 }
@@ -443,7 +728,7 @@ function App() {
           <Routes>
             <Route path="/" element={<About />} />
             <Route path="/basics" element={<Basics />} />
-            <Route path="/Personal finance" element={<PersonalFinance />} />
+            <Route path="/personal_finance" element={<PersonalFinance />} />
           </Routes>
           <footer className="footer">
             <Footer />

@@ -42,7 +42,6 @@ class PersonalFinanceProject:
         annual_custody_fee_pct,
         investment_sell_out_fee_pct,
         tax_on_gains_pct,
-        currency,
     ):
         self.initial_amount_invested = initial_amount_invested
         self.recurring_investment_frequency = recurring_investment_frequency
@@ -54,7 +53,6 @@ class PersonalFinanceProject:
         self.annual_custody_fee_pct = annual_custody_fee_pct
         self.investment_sell_out_fee_pct = investment_sell_out_fee_pct
         self.tax_on_gains_pct = tax_on_gains_pct
-        self.currency = currency
 
         self.closing_prices = self.project_closing_prices()
         self.transactions = self.project_transactions()
@@ -127,7 +125,7 @@ class PersonalFinanceProject:
                 START_DATE + relativedelta(months=i)
                 for i in range(0, self.investment_duration_yrs * 12)
             ]
-        elif self.recurring_investment_frequency == "annual":
+        elif self.recurring_investment_frequency == "yearly":
             recurring_investment_dates = [
                 START_DATE + relativedelta(years=i)
                 for i in range(0, self.investment_duration_yrs)
@@ -322,8 +320,6 @@ class PersonalFinanceProject:
                 * 100,
                 2,
             ),
-            # currency
-            "currency": self.currency,
         }
 
     def detail_projection_results(self):
@@ -335,6 +331,11 @@ class PersonalFinanceProject:
                 self.recurring_investment_amount, 2
             ),
             "total_spending": round(self.transactions["spending"].sum(), 2),
+            "inflation_corrected_total_spending": round(
+                self.transactions["spending"].sum()
+                * self.inflation_correction_factor,
+                2,
+            ),
             # buy in fees
             "buy_in_fees": round(self.transactions["buy_in_fee"].sum(), 2),
             # annual yield
@@ -393,8 +394,6 @@ class PersonalFinanceProject:
                 * self.inflation_correction_factor,
                 2,
             ),
-            # currency
-            "currency": self.currency,
         }
 
 
@@ -406,7 +405,7 @@ async def project_personal_finances(
     common: Annotated[Common, Depends()],
     initial_amount_invested: Annotated[int, Query(ge=0)],
     recurring_investment_frequency: Annotated[
-        str, Query(pattern="^(weekly|monthly|annual)$")
+        str, Query(pattern="^(weekly|monthly|yearly)$")
     ],
     recurring_investment_amount: Annotated[int, Query(ge=0)],
     investment_duration_yrs: Annotated[int, Query(gt=0)],
@@ -416,7 +415,6 @@ async def project_personal_finances(
     annual_custody_fee_pct: Annotated[float, Query(ge=0, le=100)],
     investment_sell_out_fee_pct: Annotated[float, Query(ge=0, le=100)],
     tax_on_gains_pct: Annotated[float, Query(ge=0, le=100)],
-    currency: str,
 ) -> dict:
     project = PersonalFinanceProject(
         initial_amount_invested,
@@ -429,7 +427,6 @@ async def project_personal_finances(
         annual_custody_fee_pct,
         investment_sell_out_fee_pct,
         tax_on_gains_pct,
-        currency,
     )
 
     return {

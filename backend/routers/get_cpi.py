@@ -64,13 +64,27 @@ async def get_cpi(
             """,
         )
 
-    values_dict = {}
+    cpi_values_dict = {}
     for row in cpi_values_df.iter_rows(named=True):
-        values_dict.update(
+        cpi_values_dict.update(
             {
                 row["year"]: row["value"],
             }
         )
+
+    annual_inflation_rates_dict = {}
+    for year, value in cpi_values_dict.items():
+        if year - 1 in cpi_values_dict:
+            annual_inflation_rates_dict.update(
+                {
+                    year: round(
+                        (value - cpi_values_dict[year - 1])
+                        / cpi_values_dict[year - 1]
+                        * 100,
+                        2,
+                    ),
+                }
+            )
     final_dict = {
         "cpi_id": cpi_df[0, "cpi_id"],
         "cpi_name": cpi_df[0, "cpi_name"],
@@ -79,6 +93,7 @@ async def get_cpi(
         "currency_symbol": cpi_df[0, "currency_symbol"],
         "documentation_link": cpi_df[0, "documentation_link"],
         "legal_mentions": cpi_df[0, "legal_mentions"],
-        "values": values_dict,
+        "cpi_values": cpi_values_dict,
+        "annual_inflation_rates": annual_inflation_rates_dict,
     }
     return final_dict

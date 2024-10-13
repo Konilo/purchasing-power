@@ -1,5 +1,5 @@
 run_front_dev:
-    npm run dev /app/frontend/app
+	cd /app/frontend/app && npm run dev
 
 build_front_prod:
-    npm run build /app/frontend/app
+	cd /app/frontend/app && npm run build

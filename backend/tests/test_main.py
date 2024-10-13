@@ -146,7 +146,8 @@ def test_get_cpi():
         "currency_symbol": "$",
         "documentation_link": "http://example.com",
         "legal_mentions": "Legal mentions",
-        "values": {"2020": 100.0, "2021": 110.0},
+        "cpi_values": {"2020": 100.0, "2021": 110.0},
+        "annual_inflation_rates": {"2021": 10.0},
     }
 
 
@@ -195,10 +196,9 @@ def test_project_personal_finances():
     annual_custody_fee_pct = 0.2
     investment_sell_out_fee_pct = 0.5
     tax_on_gains_pct = 17.2
-    currency = "$"
 
     response = client.get(
-        f"/project_personal_finances?initial_amount_invested={initial_amount_invested}&recurring_investment_frequency={recurring_investment_frequency}&recurring_investment_amount={recurring_investment_amount}&investment_duration_yrs={investment_duration_yrs}&annual_gross_yield={annual_gross_yield}&annual_inflation_rate={annual_inflation_rate}&investment_buy_in_fee_pct={investment_buy_in_fee_pct}&annual_custody_fee_pct={annual_custody_fee_pct}&investment_sell_out_fee_pct={investment_sell_out_fee_pct}&tax_on_gains_pct={tax_on_gains_pct}&currency={currency}",
+        f"/project_personal_finances?initial_amount_invested={initial_amount_invested}&recurring_investment_frequency={recurring_investment_frequency}&recurring_investment_amount={recurring_investment_amount}&investment_duration_yrs={investment_duration_yrs}&annual_gross_yield={annual_gross_yield}&annual_inflation_rate={annual_inflation_rate}&investment_buy_in_fee_pct={investment_buy_in_fee_pct}&annual_custody_fee_pct={annual_custody_fee_pct}&investment_sell_out_fee_pct={investment_sell_out_fee_pct}&tax_on_gains_pct={tax_on_gains_pct}",
         headers={
             "x-api-key": get_env_var("API_KEYS", ENVIRONMENT_NAME).split(",")[
                 0
@@ -219,7 +219,6 @@ def test_project_personal_finances():
             "total_inflation_pct": 67.34,
             "net_post_tax_yield": 180.35,
             "net_post_tax_inflation_corrected_yield": 107.78,
-            "currency": "$",
         },
         "details": {
             "initial_amount_invested": 0,
@@ -239,9 +238,9 @@ def test_project_personal_finances():
             "inflation_corrected_tax_on_gains": 69851.4,
             "net_post_tax_final_gain": 562703.49,
             "net_post_tax_inflation_corrected_final_gain": 336259.95,
+            "inflation_corrected_total_spending": 186444.74,
             "net_post_tax_final_value": 874703.49,
             "net_post_tax_inflation_corrected_final_value": 522704.68,
-            "currency": "$",
         },
     }
 
