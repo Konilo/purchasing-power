@@ -238,7 +238,6 @@ def test_project_personal_finances():
             "inflation_corrected_tax_on_gains": 69851.4,
             "net_post_tax_final_gain": 562703.49,
             "net_post_tax_inflation_corrected_final_gain": 336259.95,
-            "inflation_corrected_total_spending": 186444.74,
             "net_post_tax_final_value": 874703.49,
             "net_post_tax_inflation_corrected_final_value": 522704.68,
         },

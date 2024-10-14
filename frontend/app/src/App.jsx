@@ -501,7 +501,6 @@ function PersonalFinance() {
   const [detailsInflationCorrectedTaxOnGains, setDetailsInflationCorrectedTaxOnGains] = useState(0);
   const [detailsNetPostTaxFinalGain, setDetailsNetPostTaxFinalGain] = useState(0);
   const [detailsNetPostTaxInflationCorrectedFinalGain, setDetailsNetPostTaxInflationCorrectedFinalGain] = useState(0);
-  const [detailsInflationCorrectedTotalSpending, setDetailsInflationCorrectedTotalSpending] = useState(0);
   const [detailsNetPostTaxFinalValue, setDetailsNetPostTaxFinalValue] = useState(0);
   const [detailsNetPostTaxInflationCorrectedFinalValue, setDetailsNetPostTaxInflationCorrectedFinalValue] = useState(0);
 
@@ -546,7 +545,6 @@ function PersonalFinance() {
         setDetailsInflationCorrectedTaxOnGains(response.data.details.inflation_corrected_tax_on_gains);
         setDetailsNetPostTaxFinalGain(response.data.details.net_post_tax_final_gain);
         setDetailsNetPostTaxInflationCorrectedFinalGain(response.data.details.net_post_tax_inflation_corrected_final_gain);
-        setDetailsInflationCorrectedTotalSpending(response.data.details.inflation_corrected_total_spending);
         setDetailsNetPostTaxFinalValue(response.data.details.net_post_tax_final_value);
         setDetailsNetPostTaxInflationCorrectedFinalValue(response.data.details.net_post_tax_inflation_corrected_final_value);
 
@@ -750,9 +748,6 @@ function PersonalFinance() {
           netPostTaxFinalGain={detailsNetPostTaxFinalGain}
           netPostTaxInflationCorrectedFinalGain={
             detailsNetPostTaxInflationCorrectedFinalGain
-          }
-          inflationCorrectedTotalSpending={
-            detailsInflationCorrectedTotalSpending
           }
           netPostTaxFinalValue={detailsNetPostTaxFinalValue}
           netPostTaxInflationCorrectedFinalValue={

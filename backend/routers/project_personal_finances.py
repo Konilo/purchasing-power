@@ -331,11 +331,6 @@ class PersonalFinanceProject:
                 self.recurring_investment_amount, 2
             ),
             "total_spending": round(self.transactions["spending"].sum(), 2),
-            "inflation_corrected_total_spending": round(
-                self.transactions["spending"].sum()
-                * self.inflation_correction_factor,
-                2,
-            ),
             # buy in fees
             "buy_in_fees": round(self.transactions["buy_in_fee"].sum(), 2),
             # annual yield

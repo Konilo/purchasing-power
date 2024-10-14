@@ -19,7 +19,6 @@ export default function PersonalFinanceSchema({
   inflationCorrectedTaxOnGains,
   netPostTaxFinalGain,
   netPostTaxInflationCorrectedFinalGain,
-  inflationCorrectedTotalSpending,
   netPostTaxFinalValue,
   netPostTaxInflationCorrectedFinalValue,
 }) {
@@ -354,14 +353,11 @@ export default function PersonalFinanceSchema({
           letterSpacing="0em"
           className="svg-text"
         >
-          <tspan x="988" y="217.455">
+          <tspan x="988" y="227.455">
             ${amount_formatter.format(totalSpending)}&#10;
           </tspan>
-          <tspan x="988" y="235.455">
+          <tspan x="988" y="245.455">
             total spending&#10;
-          </tspan>
-          <tspan x="988" y="253.455">
-            (IC = ${amount_formatter.format(inflationCorrectedTotalSpending)})
           </tspan>
         </text>
         <path
