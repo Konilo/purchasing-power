@@ -570,11 +570,69 @@ function PersonalFinance() {
 
   return (
     <div className="personal-finance">
-      <h1>Personal Finance</h1>
-      <h2>Currencies&apos; purchasing power falls over time. What now?</h2>
-      <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+      <div className="personal-finance-text">
+        <h1>Personal Finance</h1>
+        <h2>Planning for the future</h2>
+        <p>
+          In the Basics section, we have seen that currencies&apos; purchasing
+          power generally decreases over time. Hence, for long-term personal
+          finance projects, taking inflation into account for our projections is
+          essential. This is what we will do here.
+        </p>
+        <p>
+          First off, a personal finance project can be characterized based on
+          the following criteria, essentially:
+          <ul>
+            <li>
+              the amount of capital we are aiming for <em>in todays money</em>
+            </li>
+            <li>
+              the investment horizon (when do we want to have this capital
+              available?)
+            </li>
+            <li>
+              and the risk aversion of the investor &ndash; more risk equals
+              more potential gain and vice versa
+            </li>
+          </ul>
+        </p>
+        <p>
+          For instance, if the goal is to buy a good or service in ten years
+          that currently costs twenty thousand dollars, and if we consider an
+          arbitrary annual inflation rate of 2%, we need to aim for a capital of
+          $20,000.00 &times; (1 + 0.02)<sup>10</sup> = $24,379.89 in 10 years.
+        </p>
+        <p>
+          To plan projects like this, simulation is crucial and the simulation
+          tool below is designed to this effect. It requires several pieces of
+          information on top of the 3 project characterstics discussed above, so we need to:
+        </p>
+        <ul>
+          <li>
+            Define the amount of capital we will invest intially and/or
+            periodically
+          </li>
+          <li>
+            Based on our risk aversion and investment horizon, select the
+            asset(s) in which we will invest and the expected annual yield
+          </li>
+          <li>
+            Understand the fees and taxes that will be applied to our investment
+          </li>
+          <li>Determine the annual inflation rate we expect to face</li>
+          <li>
+            (And bare in mind that future yields and inflation rates are totally
+            uncertain)
+          </li>
+        </ul>
+        <p>
+          We can now use the simulator below to obtain, between others, the net,
+          post-tax, inflation-corrected capital we would have accumulated once
+          the investment horizon is reached, given the parameters we have set.
+        </p>
+      </div>
       <h2>Simulation</h2>
-      <div className="personal-finance-simulation-inputs">
+      <div className="personal-finance-inputs">
         <h3>Inputs</h3>
         <AmountInput
           id="personal-finance-initial-amount-invested"
