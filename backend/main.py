@@ -5,23 +5,20 @@ from fastapi.middleware.cors import CORSMiddleware
 
 # import uvicorn  # Uncomment this for debugging
 
-# Allow imports from the parent directory
-dir_abspath = os.path.dirname(__file__)
-parent_dir_abspath = os.path.dirname(dir_abspath)
-sys.path.append(parent_dir_abspath)
-
-from shared.environments_utils import load_env_from_dir
-from shared.environments_utils import get_env_var
+from shared.environments_utils import load_env_from_dir, get_env_var
 
 # Load the .env of the current service of the monorepo
+dir_abspath = os.path.dirname(__file__)
 load_env_from_dir(dir_abspath)
 
 ENVIRONMENT_NAME = get_env_var("ENVIRONMENT_NAME")
 
-from .routers import get_cpis
-from .routers import get_cpi
-from .routers import get_cpi_correction
-from .routers import project_personal_finances
+from .routers import (
+    get_cpis,
+    get_cpi,
+    get_cpi_correction,
+    project_personal_finances,
+)
 
 
 app = FastAPI()

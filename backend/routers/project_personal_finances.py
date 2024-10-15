@@ -1,32 +1,14 @@
-import os
-import sys
 import datetime
 from typing_extensions import Annotated
 from fastapi import Depends, APIRouter, Query
 import polars as pl
 from dateutil.relativedelta import relativedelta
 
-# Allow imports from the parent directory
-dir_abspath = os.path.dirname(__file__)
-parent_dir_abspath = os.path.dirname(dir_abspath)
-sys.path.append(parent_dir_abspath)
-
-from shared.environments_utils import load_env_from_dir
 from .common import Common
-
-# Load the .env of the current service of the monorepo
-load_env_from_dir(dir_abspath)
-
 
 START_DATE = datetime.date(2000, 1, 1)
 START_ASSET_PRICE = 1
 START_CPI_VALUE = 100
-
-
-# recurring_investment_amount is not concerned by inflation correction: it's a
-# fixed currency amount (fixed by the investor), even though its purchasing
-# power will change -- the DCA amount is not meant to change with inflation in
-# this simulation tool
 
 
 class PersonalFinanceProject:
@@ -131,6 +113,10 @@ class PersonalFinanceProject:
                 for i in range(0, self.investment_duration_yrs)
             ]
 
+        # recurring_investment_amount is not concerned by inflation correction:
+        # it's a fixed currency amount (fixed by the investor), even though its
+        # purchasing power will change -- the DCA amount is not meant to change
+        # with inflation in this simulation tool
         transactions = transactions.vstack(
             pl.DataFrame(
                 {

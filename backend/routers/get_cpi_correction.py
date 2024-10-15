@@ -5,18 +5,13 @@ from typing_extensions import Annotated
 from fastapi import Depends, APIRouter, Query, Path
 import polars as pl
 
-# Allow imports from the parent directory
-dir_abspath = os.path.dirname(__file__)
-parent_dir_abspath = os.path.dirname(dir_abspath)
-sys.path.append(parent_dir_abspath)
-
-from shared.environments_utils import load_env_from_dir
+from shared.environments_utils import load_env_from_dir, get_env_var
 from shared.psql_connector import PsqlConnector
-from shared.environments_utils import get_env_var
 from .common import Common
 
 # Load the .env of the current service of the monorepo
-load_env_from_dir(dir_abspath)
+parent_dir_abspath = os.path.dirname(os.path.dirname(__file__))
+load_env_from_dir(parent_dir_abspath)
 
 ENVIRONMENT_NAME = get_env_var("ENVIRONMENT_NAME")
 
