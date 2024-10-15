@@ -2,17 +2,9 @@ from unittest.mock import patch
 from fastapi.testclient import TestClient
 import inspect
 import polars as pl
-import os
-import sys
 
-from shared.environments_utils import load_env_from_dir, get_env_var
+from shared.environments_utils import get_env_var
 from ..main import app
-
-# Load the .env of the current service of the monorepo
-parent_dir_abspath = os.path.dirname(os.path.dirname(__file__))
-load_env_from_dir(parent_dir_abspath)
-
-ENVIRONMENT_NAME = get_env_var("ENVIRONMENT_NAME")
 
 
 client = TestClient(app)
@@ -93,9 +85,9 @@ def test_get_cpis():
     response = client.get(
         f"/cpis",
         headers={
-            "x-api-key": get_env_var("API_KEYS", ENVIRONMENT_NAME).split(",")[
-                0
-            ],
+            "x-api-key": get_env_var(
+                "API_KEYS", get_env_var("ENVIRONMENT_NAME")
+            ).split(",")[0],
         },
     )
     json_response = response.json()
@@ -123,9 +115,9 @@ def test_get_cpi():
     response = client.get(
         f"/cpis/{cpi_id}",
         headers={
-            "x-api-key": get_env_var("API_KEYS", ENVIRONMENT_NAME).split(",")[
-                0
-            ],
+            "x-api-key": get_env_var(
+                "API_KEYS", get_env_var("ENVIRONMENT_NAME")
+            ).split(",")[0],
         },
     )
     json_response = response.json()
@@ -163,9 +155,9 @@ def test_get_cpi_correction():
     response = client.get(
         f"/cpis/{cpi_id}/correction?year_a={year_a}&year_b={year_b}&amount={amount}",
         headers={
-            "x-api-key": get_env_var("API_KEYS", ENVIRONMENT_NAME).split(",")[
-                0
-            ],
+            "x-api-key": get_env_var(
+                "API_KEYS", get_env_var("ENVIRONMENT_NAME")
+            ).split(",")[0],
         },
     )
     json_response = response.json()
@@ -193,9 +185,9 @@ def test_project_personal_finances():
     response = client.get(
         f"/project_personal_finances?initial_amount_invested={initial_amount_invested}&recurring_investment_frequency={recurring_investment_frequency}&recurring_investment_amount={recurring_investment_amount}&investment_duration_yrs={investment_duration_yrs}&annual_gross_yield={annual_gross_yield}&annual_inflation_rate={annual_inflation_rate}&investment_buy_in_fee_pct={investment_buy_in_fee_pct}&annual_custody_fee_pct={annual_custody_fee_pct}&investment_sell_out_fee_pct={investment_sell_out_fee_pct}&tax_on_gains_pct={tax_on_gains_pct}",
         headers={
-            "x-api-key": get_env_var("API_KEYS", ENVIRONMENT_NAME).split(",")[
-                0
-            ],
+            "x-api-key": get_env_var(
+                "API_KEYS", get_env_var("ENVIRONMENT_NAME")
+            ).split(",")[0],
         },
     )
 

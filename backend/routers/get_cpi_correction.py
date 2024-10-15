@@ -1,19 +1,11 @@
-import os
-import sys
 from datetime import datetime
 from typing_extensions import Annotated
 from fastapi import Depends, APIRouter, Query, Path
 import polars as pl
 
-from shared.environments_utils import load_env_from_dir, get_env_var
+from shared.environments_utils import get_env_var
 from shared.psql_connector import PsqlConnector
 from .common import Common
-
-# Load the .env of the current service of the monorepo
-parent_dir_abspath = os.path.dirname(os.path.dirname(__file__))
-load_env_from_dir(parent_dir_abspath)
-
-ENVIRONMENT_NAME = get_env_var("ENVIRONMENT_NAME")
 
 
 router = APIRouter()
@@ -28,11 +20,15 @@ async def get_cpi_correction(
     amount: Annotated[float, Query(gt=0)],
 ) -> dict:
     with PsqlConnector(
-        dbname=get_env_var("PSQL_DB_NAME", ENVIRONMENT_NAME),
-        user=get_env_var("PSQL_DB_READ_ONLY_USER", ENVIRONMENT_NAME),
-        password=get_env_var("PSQL_DB_READ_ONLY_PASSWORD", ENVIRONMENT_NAME),
-        host=get_env_var("PSQL_DB_HOST", ENVIRONMENT_NAME),
-        port=get_env_var("PSQL_DB_PORT", ENVIRONMENT_NAME),
+        dbname=get_env_var("PSQL_DB_NAME", get_env_var("ENVIRONMENT_NAME")),
+        user=get_env_var(
+            "PSQL_DB_READ_ONLY_USER", get_env_var("ENVIRONMENT_NAME")
+        ),
+        password=get_env_var(
+            "PSQL_DB_READ_ONLY_PASSWORD", get_env_var("ENVIRONMENT_NAME")
+        ),
+        host=get_env_var("PSQL_DB_HOST", get_env_var("ENVIRONMENT_NAME")),
+        port=get_env_var("PSQL_DB_PORT", get_env_var("ENVIRONMENT_NAME")),
     ) as psql_conn:
         cpi_values_df = psql_conn.execute_query_return_df(
             query=f"""

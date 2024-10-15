@@ -1,5 +1,4 @@
 import os
-import sys
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -10,8 +9,6 @@ from shared.environments_utils import load_env_from_dir, get_env_var
 # Load the .env of the current service of the monorepo
 dir_abspath = os.path.dirname(__file__)
 load_env_from_dir(dir_abspath)
-
-ENVIRONMENT_NAME = get_env_var("ENVIRONMENT_NAME")
 
 from .routers import (
     get_cpis,
@@ -26,7 +23,9 @@ app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=get_env_var("ALLOW_ORIGINS", ENVIRONMENT_NAME).split(","),
+    allow_origins=get_env_var(
+        "ALLOW_ORIGINS", get_env_var("ENVIRONMENT_NAME")
+    ).split(","),
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
