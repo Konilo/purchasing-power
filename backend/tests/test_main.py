@@ -1,10 +1,17 @@
+import os
+import sys
 from unittest.mock import patch
 from fastapi.testclient import TestClient
 import inspect
 import polars as pl
 
+# Allow imports from the parent directory
+dir_abspath = os.path.dirname(__file__)
+grandparent_dir_abspath = os.path.dirname(os.path.dirname(dir_abspath))
+sys.path.append(grandparent_dir_abspath)
+
 from shared.environments_utils import get_env_var
-from ..main import app
+from backend.main import app
 
 
 client = TestClient(app)

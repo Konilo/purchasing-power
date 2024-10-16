@@ -36,9 +36,9 @@ And then launch the "Frontend Chrome" Run and Debug configuration in VSCode.
 
 ### Building the app
 
-In the frontend's dev Docker container, run this below and the static files will appear in the `dist` directory at the root of the Vite app directory.
+In the frontend's dev Docker container, run this below in the frontend service's directory. The static files will appear in the `dist/` directory at the root of the Vite app directory.
 ```bash
-npm run build /app/frontend/app
+make build_front_prod
 ```
 
 
