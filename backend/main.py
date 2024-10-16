@@ -15,7 +15,7 @@ from shared.environments_utils import load_env_from_dir, get_env_var
 # Load the .env of the current service of the monorepo
 load_env_from_dir(dir_abspath)
 
-from .routers import (
+from backend.routers import (
     get_cpis,
     get_cpi,
     get_cpi_correction,

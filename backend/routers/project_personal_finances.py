@@ -4,7 +4,7 @@ from fastapi import Depends, APIRouter, Query
 import polars as pl
 from dateutil.relativedelta import relativedelta
 
-from .common import Common
+from backend.routers.common import Common
 
 START_DATE = datetime.date(2000, 1, 1)
 START_ASSET_PRICE = 1

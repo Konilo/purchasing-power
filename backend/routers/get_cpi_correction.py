@@ -5,7 +5,7 @@ import polars as pl
 
 from shared.environments_utils import get_env_var
 from shared.psql_connector import PsqlConnector
-from .common import Common
+from backend.routers.common import Common
 
 
 router = APIRouter()
