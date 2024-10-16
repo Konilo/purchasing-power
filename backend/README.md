@@ -30,7 +30,7 @@ ls -l ~/aws_keys/"<name of the key pair>.pem"
 
 # Connect to the EC2 instance using
 # Same as the "Example" command but the PEM file path points to the new ~/aws_keys directory
-ssh -i ~/aws_keys/"<name of the key pair>.pem" ubuntu@ec2-15-188-48-110.eu-west-3.compute.amazonaws.com
+ssh -i ~/aws_keys/"<name of the key pair>.pem" <username>@<Public IPv4 DNS>
 ```
 
 

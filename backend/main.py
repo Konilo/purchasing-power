@@ -1,5 +1,6 @@
 import os
 import sys
+import logging
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -21,6 +22,15 @@ from backend.routers import (
     get_cpi_correction,
     project_personal_finances,
 )
+
+logging.basicConfig(
+    format="%(asctime)s %(levelname)-8s %(message)s",
+    level=logging.INFO,
+    datefmt="%Y-%m-%d %H:%M:%S",
+)
+logger = logging.getLogger(__name__)
+
+logger.info(f"Running in {get_env_var('ENVIRONMENT_NAME')} environment")
 
 
 app = FastAPI()
