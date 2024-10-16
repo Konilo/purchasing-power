@@ -17,6 +17,14 @@ server: {
   },
 ```
 
+To run and debug the frontend, run
+```bash
+cd frontend/
+make run_front_dev
+```
+
+And then launch the "Frontend Chrome" Run and Debug configuration in VSCode.
+
 
 ## Deployment on production (AWS S3)
 ### Creating a bucket

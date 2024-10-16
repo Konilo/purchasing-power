@@ -1,7 +1,7 @@
 # :chart_with_upwards_trend: Purchasing Power
 ## The application
 
-Purchasing Power is a web application that provides tools to understand the changing nature of a currency's purchasing power over time and, in the next versions, the impact those evolutions have on simple investment projections. The application contains a database of Consumer Price Indexes (CPIs) gathered from official sources and covers 36 countries (EU and US).
+Purchasing Power is a web application that provides tools to understand the changing nature of a currency's purchasing power over time and the impact those evolutions have on simple investment projections. The application contains a database of Consumer Price Indexes (CPIs) gathered from official sources and covers 36 countries (EU and US).
 
 ![Screenshot of the app's basics tab](readme_assets/app_basics_tab.png)
 
@@ -13,7 +13,7 @@ The application is composed of four services:
     - Python, Docker.
     - Runs punctually on the local machine.
 - Enrichment: normalizes the data in the database.
-    - PSQL, Python, Docker.
+    - PostgreSQL, Python, Docker.
     - Runs punctually on the local machine.
 - Backend: uses the database and some (tested) logic to provide data to the frontend.
     - Python (FastAPI), Docker.
