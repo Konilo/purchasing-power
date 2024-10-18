@@ -56,8 +56,7 @@ export default function PersonalFinance() {
   const [investmentSellOutFee, setInvestmentSellOutFee] = useState(0);
   const [taxOnGains, setTaxOnGains] = useState(17.5);
 
-  // Simulation output details
-  const [summaryTotalSpending, setSummaryTotalSpending] = useState(0);
+  // Simulation output summary
   const [summaryNetPostTaxFinalValue, setSummaryNetPostTaxFinalValue] =
     useState(0);
   const [
@@ -140,7 +139,6 @@ export default function PersonalFinance() {
         }
       )
       .then((response) => {
-        setSummaryTotalSpending(response.data.summary.total_spending);
         setSummaryNetPostTaxFinalValue(
           response.data.summary.net_post_tax_final_value
         );
@@ -358,28 +356,54 @@ export default function PersonalFinance() {
       <div className="personal-finance-outputs">
         <h3>Outputs</h3>
         <h4>Summary</h4>
-        <p>
-          Total spending: ${amount_formatter.format(summaryTotalSpending)}{" "}
-          <br />
-          Net post-tax final capital: $
-          {amount_formatter.format(summaryNetPostTaxFinalValue)} <br />
-          Net post-tax inflation-corrected final capital: $
-          {amount_formatter.format(
-            summaryNetPostTaxInflationCorrectedFinalValue
-          )}{" "}
-          <br />
-          Net post-tax final gain: $
-          {amount_formatter.format(summaryNetPostTaxFinalGain)} <br />
-          Net post-tax inflation-corrected final gain: $
-          {amount_formatter.format(
-            summaryNetPostTaxInflationCorrectedFinalGain
-          )}{" "}
-          <br />
-          Total inflation: {summaryTotalInflationPct}% <br />
-          Net post-tax yield: {summaryNetPostTaxYield}% <br />
-          Net post-tax inflation-corrected yield:{" "}
-          {summaryNetPostTaxInflationCorrectedYield}% <br />
-        </p>
+        <ul>
+          <li>
+            By investing ${amount_formatter.format(initialAmountInvested)} now
+            and ${amount_formatter.format(recurringInvestmentAmount)}{" "}
+            {recurringInvestmentFrequency}, you would constitute a net,
+            post-tax, final capital of{" "}
+            <strong>
+              ${amount_formatter.format(summaryNetPostTaxFinalValue)}
+            </strong>{" "}
+            after {investmentDuration} years.
+          </li>
+          <li>
+            In {investmentDuration} years, this amount would have the purchasing
+            power of{" "}
+            <strong>
+              $
+              {amount_formatter.format(
+                summaryNetPostTaxInflationCorrectedFinalValue
+              )}
+            </strong>{" "}
+            today.
+          </li>
+        </ul>
+        <ul>
+          <li>
+            Total inflation over the investment horizon:{" "}
+            {summaryTotalInflationPct}%
+          </li>
+        </ul>
+        <ul>
+          <li>Net, post-tax yield: {summaryNetPostTaxYield}%</li>
+          <li>
+            Net, post-tax, inflation-corrected yield:{" "}
+            {summaryNetPostTaxInflationCorrectedYield}%
+          </li>
+        </ul>
+        <ul>
+          <li>
+            Net, post-tax final gain: $
+            {amount_formatter.format(summaryNetPostTaxFinalGain)}
+          </li>
+          <li>
+            Net, post-tax, inflation-corrected final gain: $
+            {amount_formatter.format(
+              summaryNetPostTaxInflationCorrectedFinalGain
+            )}
+          </li>
+        </ul>
         <h4>Details</h4>
         <PersonalFinanceSchema
           initialAmountInvested={detailsInitialAmountInvested}
